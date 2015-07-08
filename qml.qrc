@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="main.qml">qml/main.qml</file>
+        <file alias="MediaWidget.qml">qml/MediaWidget.qml</file>
+        <file alias="WebWidget.qml">qml/WebWidget.qml</file>
+        <file alias="kazna.jpg">images/kazna.jpg</file>
+    </qresource>
+</RCC>
