@@ -7,7 +7,7 @@ Rectangle {
     height: parent.height  - parent.border.width * 2 - 1
     anchors.centerIn: parent
 
-    property var source: Null
+    property var source: ""
     property var _paused: true
     property var _muted: false
 

@@ -4,5 +4,10 @@
         <file alias="MediaWidget.qml">qml/MediaWidget.qml</file>
         <file alias="WebWidget.qml">qml/WebWidget.qml</file>
         <file alias="kazna.jpg">images/kazna.jpg</file>
+        <file alias="rain.jpg">images/rain.jpg</file>
+        <file alias="snow.jpg">images/snow.jpg</file>
+        <file alias="snow1.jpg">images/snow1.jpg</file>
+        <file alias="cloud.jpg">images/cloud.jpg</file>
+        <file>WeatherWidget.qml</file>
     </qresource>
 </RCC>

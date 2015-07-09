@@ -20,29 +20,12 @@ ApplicationWindow {
         source: "qrc:///kazna.jpg"
 
         Rectangle {
-            id: top_frame
-
-            x: parent.width / 2 - width / 2
-            y: 6
-
-            width: parent.width * 99 / 100
-            height: parent.height * 25 / 100
-
-            radius: 20
-            border.color: "#AAAAAA"
-            border.width: 2
-
-            anchors.topMargin: 5
-            color: "#33FFFFFF"
-
-        }
-
-        Rectangle {
+            y: 10
             id: main_frame
-            width: parent.width * 99 / 100
-            height: parent.height * 73 / 100
-            anchors.top: top_frame.bottom
-            anchors.horizontalCenter: top_frame.horizontalCenter
+            width: parent.width * 78 / 100
+            height: parent.height * 98 / 100
+            //anchors.top: right_frame.bottom
+            //anchors.horizontalCenter: right_frame.horizontalCenter
             anchors.margins: 10
             border.color: "#AAAAAA"
             border.width: 2
@@ -54,9 +37,36 @@ ApplicationWindow {
                 if (component.status === Component.Ready) {
                     var childRec = component.createObject(main_frame);
                     web = childRec;
-                    //web.setSource("file:///home/user/1.mp4");
+                    web.setSource("file:///home/user/1.mp4");
                     web.ended.connect(setHello);
                     web.__error.connect(eRR);
+                }
+            }
+        }
+
+        Rectangle {
+            id: right_frame
+
+            x: parent.width / 2 - width / 2
+            y: 10
+
+            width: parent.width * 21 / 100
+            height: parent.height * 50 / 100
+
+            radius: 20
+            border.color: "#AAAAAA"
+            border.width: 2
+
+            anchors.leftMargin: 10
+            anchors.left: main_frame.right
+            color: "#99FFFFFF"
+
+            Component.onCompleted: {
+                var component = Qt.createComponent("WeatherWidget.qml");
+                main.title = component.errorString()
+                if (component.status === Component.Ready) {
+                    var childRec = component.createObject(right_frame);
+                    //childRec.setSource("file:///home/user/1.mp4");
                 }
             }
         }
