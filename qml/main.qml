@@ -9,7 +9,7 @@ ApplicationWindow {
     width: 640
     height: 480
     title: qsTr("Hello World")
-    //visibility: "FullScreen"
+    visibility: "FullScreen"
     color: "#CCCCCC"
 
     property var web: Null
@@ -54,11 +54,16 @@ ApplicationWindow {
                 if (component.status === Component.Ready) {
                     var childRec = component.createObject(main_frame);
                     web = childRec;
-                    //web.setSource("file:///home/rav/1.mp4");
+                    //web.setSource("file:///home/user/1.mp4");
                     web.ended.connect(setHello);
+                    web.__error.connect(eRR);
                 }
             }
         }
+    }
+
+    function eRR(_err, str) {
+        console.log(_err, str)
     }
 
     function setHello() {

@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QtMultimedia 5.0
+import QtAV 1.6
 
 Rectangle {
     id: mediabWidget
@@ -9,12 +9,17 @@ Rectangle {
 
     property var source: Null
     property var _paused: true
+    property var _muted: false
 
     signal loaded
     signal ended
+    signal __error(int _error, string _errorString)
 
-    MediaPlayer {
+    AVPlayer {
         id: player
+
+        muted: false
+        autoPlay: false
 
         onPaused: {
             _paused = true
@@ -23,7 +28,7 @@ Rectangle {
         onStopped: {
             _paused = true
 
-            if(state === MediaPlayer.EndOfMedia)
+            if(status === AVPlayer.EndOfMedia)
                 ended()
         }
 
@@ -31,10 +36,12 @@ Rectangle {
             _paused = false
         }
 
-
+        onError: {
+            __error(error, errorString)
+        }
     }
 
-    VideoOutput {
+    VideoOutput2 {
             width: parent.width
             height: parent.height
 
@@ -47,15 +54,37 @@ Rectangle {
             id: playArea
             anchors.fill: parent
             onClicked: {
-                if(_paused === true && player.state === MediaPlayer.Buffered)
-                    player.play()
-                else player.pause()
+                if(player.error === AVPlayer.NoError) {
+                    if(_paused === true)
+                        player.play()
+                    else player.pause()
+                }
+                else player.stop()
             }
+    }
+
+    Timer {
+        id: tmr
+        interval: 200
+        repeat: false
+        triggeredOnStart: false
+        running: false
+
+        onTriggered: {player.pause(); player.seek(0); player.muted = _muted;}
     }
 
     function setSource(_path) {
         source = _path
         player.source = _path
+
+        player.muted = true
+        player.play()
+        tmr.start()
+
     }
 
+    function muted(flag) {
+        _muted = flag
+        player.muted = flag
+    }
 }
