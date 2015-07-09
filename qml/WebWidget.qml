@@ -13,7 +13,7 @@ Item {
     property var source: ""
 
     signal loaded
-    signal scrolled
+    signal ended
 
     ScrollView {
         id: sv
@@ -35,7 +35,7 @@ Item {
                 }
                 else if(contentHeight <= sv.height && loadRequest.status === WebView.LoadSucceededStatus) {
                     loaded()
-                    scrolled()
+                    ended()
                 }
             }
         }
@@ -52,7 +52,7 @@ Item {
                 sv.flickableItem.contentY = sv.flickableItem.contentY + 1
                 if(sv.flickableItem.contentY >= web1.contentHeight - sv.height) {
                     tmr.stop()
-                    scrolled()
+                    ended()
                     tmr1.start()
                 }
             }
