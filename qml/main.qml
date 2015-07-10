@@ -26,19 +26,19 @@ ApplicationWindow {
             width: parent.width * 77 / 100
             height: parent.height * 98 / 100
             anchors.margins: 10
-            border.color: "#AAAAAA"
-            border.width: 2
-            color: "#009900FF"
+            border.color: "#000000"
+            border.width: 1
+            //color: "#009900FF"
 
             Component.onCompleted: {
-                var component = Qt.createComponent("MediaWidget.qml");
+                var component = Qt.createComponent("WebWidget.qml");
                 main.title = component.errorString()
                 if (component.status === Component.Ready) {
                     var childRec = component.createObject(main_frame);
                     web = childRec;
-                    web.setSource("file:///home/user/1.mp4");
+                    web.setSource("http://roskazna.ru/");
                     web.ended.connect(setHello);
-                    web.__error.connect(eRR);
+                    //web.__error.connect(eRR);
                 }
             }
         }
@@ -52,9 +52,9 @@ ApplicationWindow {
             width: parent.width * 21 / 100
             height: parent.height * 49 / 100
 
-            radius: 20
+            //radius: 20
             border.color: "#000000"
-            border.width: 2
+            border.width: 1
 
             anchors.leftMargin: 10
             anchors.left: main_frame.right
@@ -79,9 +79,9 @@ ApplicationWindow {
             width: parent.width * 21 / 100
             height: parent.height * 48 / 100
 
-            radius: 20
+            //radius: 20
             border.color: "#000000"
-            border.width: 2
+            border.width: 1
 
             anchors.leftMargin: 10
             anchors.topMargin: 10
