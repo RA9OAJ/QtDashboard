@@ -15,42 +15,34 @@ Item {
     signal loaded
     signal ended
 
-    ScrollView {
-        id: sv
-        width: parent.width
-        height: parent.height
-        verticalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-        horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-
-        WebView {
+    WebView {
             id: web1
             width: parent.width
             height: parent.height
             url: "http://yandex.ru/"
             onLoadingChanged: {
-                if(contentHeight > sv.height && loadRequest.status === WebView.LoadSucceededStatus) {
+                if(contentHeight > height && loadRequest.status === WebView.LoadSucceededStatus) {
                     tmr.stop()
                     tmr.start()
-                    sv.flickableItem.contentY = 0
+                    web1.contentY = 0
                 }
-                else if(contentHeight <= sv.height && loadRequest.status === WebView.LoadSucceededStatus) {
+                else if(contentHeight <= height && loadRequest.status === WebView.LoadSucceededStatus) {
                     loaded()
                     ended()
                 }
             }
         }
 
-    }
 
     Item {
         Timer {
             id: tmr
-            interval: 70
+            interval: 100
             running: false
             repeat: true
             onTriggered: {
-                sv.flickableItem.contentY = sv.flickableItem.contentY + 1
-                if(sv.flickableItem.contentY >= web1.contentHeight - sv.height) {
+                web1.flick(0,-67)
+                if(web1.contentY >= web1.contentHeight - height) {
                     tmr.stop()
                     ended()
                     tmr1.start()
@@ -66,7 +58,7 @@ Item {
             triggeredOnStart: false
             onTriggered: {
                 webWidget.visible = false
-                sv.flickableItem.contentY = 0
+                web1.contentY = 0
             }
         }
     }

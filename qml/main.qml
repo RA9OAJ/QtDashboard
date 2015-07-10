@@ -38,7 +38,6 @@ ApplicationWindow {
                     web = childRec;
                     web.setSource("http://roskazna.ru/");
                     web.ended.connect(setHello);
-                    //web.__error.connect(eRR);
                 }
             }
         }
