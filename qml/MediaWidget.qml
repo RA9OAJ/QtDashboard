@@ -3,8 +3,8 @@ import QtAV 1.6
 
 Rectangle {
     id: mediabWidget
-    width: parent.width - parent.border.width * 2 - 1
-    height: parent.height  - parent.border.width * 2 - 1
+    width: parent.width - parent.border.width * 2
+    height: parent.height  - parent.border.width * 2
     anchors.centerIn: parent
 
     property var source: ""

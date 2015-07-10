@@ -20,12 +20,11 @@ ApplicationWindow {
         source: "qrc:///kazna.jpg"
 
         Rectangle {
+            x: 10
             y: 10
             id: main_frame
-            width: parent.width * 78 / 100
+            width: parent.width * 77 / 100
             height: parent.height * 98 / 100
-            //anchors.top: right_frame.bottom
-            //anchors.horizontalCenter: right_frame.horizontalCenter
             anchors.margins: 10
             border.color: "#AAAAAA"
             border.width: 2
@@ -45,30 +44,59 @@ ApplicationWindow {
         }
 
         Rectangle {
-            id: right_frame
+            id: right_frame1
 
             x: parent.width / 2 - width / 2
             y: 10
 
             width: parent.width * 21 / 100
-            height: parent.height * 50 / 100
+            height: parent.height * 49 / 100
 
             radius: 20
-            border.color: "#AAAAAA"
+            border.color: "#000000"
             border.width: 2
 
             anchors.leftMargin: 10
             anchors.left: main_frame.right
-            color: "#99FFFFFF"
+            //color: "#99FFFFFF"
 
-            Component.onCompleted: {
+            /*Component.onCompleted: {
                 var component = Qt.createComponent("WeatherWidget.qml");
                 main.title = component.errorString()
                 if (component.status === Component.Ready) {
-                    var childRec = component.createObject(right_frame);
+                    var childRec = component.createObject(right_frame1);
                     //childRec.setSource("file:///home/user/1.mp4");
                 }
-            }
+            }*/
+        }
+
+        Rectangle {
+            id: right_frame2
+
+            x: parent.width / 2 - width / 2
+            y: 10
+
+            width: parent.width * 21 / 100
+            height: parent.height * 48 / 100
+
+            radius: 20
+            border.color: "#000000"
+            border.width: 2
+
+            anchors.leftMargin: 10
+            anchors.topMargin: 10
+            anchors.left: main_frame.right
+            anchors.top: right_frame1.bottom
+            //color: "#99FFFFFF"
+
+            /*Component.onCompleted: {
+                var component = Qt.createComponent("WeatherWidget.qml");
+                main.title = component.errorString()
+                if (component.status === Component.Ready) {
+                    var childRec = component.createObject(right_frame2);
+                    //childRec.setSource("file:///home/user/1.mp4");
+                }
+            }*/
         }
     }
 
