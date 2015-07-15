@@ -10,5 +10,6 @@
         <file alias="cloud.jpg">images/cloud.jpg</file>
         <file alias="WeatherWidget.qml">qml/WeatherWidget.qml</file>
         <file alias="DateTimeWidget.qml">qml/DateTimeWidget.qml</file>
+        <file>qml/WidgetManager.qml</file>
     </qresource>
 </RCC>
