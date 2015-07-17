@@ -21,14 +21,16 @@ Item {
             height: parent.height
             url: "http://yandex.ru/"
             onLoadingChanged: {
-                if(contentHeight > height && loadRequest.status === WebView.LoadSucceededStatus) {
-                    tmr.stop()
-                    tmr.start()
-                    web1.contentY = 0
-                }
-                else if(contentHeight <= height && loadRequest.status === WebView.LoadSucceededStatus) {
+                if(loadRequest.status === WebView.LoadSucceededStatus && loadProgress === 100) {
                     loaded()
-                    ended()
+                    if(contentHeight > height) {
+                        tmr.stop()
+                        tmr.start()
+                        web1.contentY = 0
+                    }
+                    else if(contentHeight <= height) {
+                        ended()
+                    }
                 }
             }
         }
@@ -37,7 +39,7 @@ Item {
     Item {
         Timer {
             id: tmr
-            interval: 100
+            interval: 50
             running: false
             repeat: true
             onTriggered: {

@@ -25,19 +25,42 @@ ApplicationWindow {
             id: main_frame
             width: parent.width * 77 / 100
             height: parent.height * 98 / 100
+            color: "transparent"
+        }
+
+        Rectangle {
+            x: -10000
+            y: main_frame.y
+            id: frame
+            width: main_frame.width
+            height: main_frame.height
             anchors.margins: 10
             border.color: "#000000"
             border.width: 1
             //color: "#009900FF"
 
             Component.onCompleted: {
-                var component = Qt.createComponent("WebWidget.qml");
+                var component = Qt.createComponent("WidgetManager.qml");
                 main.title = component.errorString()
                 if (component.status === Component.Ready) {
-                    var childRec = component.createObject(main_frame);
+                    var childRec = component.createObject(frame);
                     web = childRec;
-                    web.setSource("http://roskazna.ru/");
                     web.ended.connect(setHello);
+                    web.loaded.connect(showMain);
+                }
+            }
+
+            Behavior on x {
+                SpringAnimation {
+                    spring: 2
+                    damping: 0.35
+                }
+            }
+
+            Behavior on y {
+                SpringAnimation {
+                    spring: 2
+                    damping: 0.35
                 }
             }
         }
@@ -58,15 +81,6 @@ ApplicationWindow {
             anchors.leftMargin: 10
             anchors.left: main_frame.right
             //color: "#99FFFFFF"
-
-            /*Component.onCompleted: {
-                var component = Qt.createComponent("WeatherWidget.qml");
-                main.title = component.errorString()
-                if (component.status === Component.Ready) {
-                    var childRec = component.createObject(right_frame1);
-                    //childRec.setSource("file:///home/user/1.mp4");
-                }
-            }*/
         }
 
         Rectangle {
@@ -87,17 +101,9 @@ ApplicationWindow {
             anchors.left: main_frame.right
             anchors.top: right_frame1.bottom
             //color: "#99FFFFFF"
-
-            /*Component.onCompleted: {
-                var component = Qt.createComponent("WeatherWidget.qml");
-                main.title = component.errorString()
-                if (component.status === Component.Ready) {
-                    var childRec = component.createObject(right_frame2);
-                    //childRec.setSource("file:///home/user/1.mp4");
-                }
-            }*/
         }
     }
+
 
     function eRR(_err, str) {
         console.log(_err, str)
@@ -105,6 +111,10 @@ ApplicationWindow {
 
     function setHello() {
         main.title = "Hello!!!"
+        frame.x = -50 - (frame.x + frame.width)
     }
 
+    function showMain() {
+        frame.x = main_frame.x
+    }
 }
