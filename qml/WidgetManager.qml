@@ -5,7 +5,7 @@ Item {
     width: parent.width
     height: parent.height
 
-    property var objectsOnCache: 2
+    property var objectsOnCache: 1
 
     signal loaded //генерится при полной загрузке материала
     signal ended //генерится при таймауте тамера времени показа материала
@@ -25,13 +25,18 @@ Item {
         createObject()
     }
 
-    function createObject(){
+    function createObject(cache){
+        cache = typeof cache != "undefined" ? cache : false
+
         if(srcmanager.size > 0) {
-            console.log(srcmanager.sourceType, SourceManager.WEB)
             var component = null;
             switch (srcmanager.sourceType) {
             case SourceManager.WEB:
                 component = Qt.createComponent("WebWidget.qml");
+                break
+            case SourceManager.AUDIO:
+            case SourceManager.VIDEO:
+                component = Qt.createComponent("MediaWidget.qml");
                 break
             default:
                 break

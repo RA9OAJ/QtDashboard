@@ -15,12 +15,12 @@ SourceManager::MediaTypes SourceManager::sourceType() const
     return WEB;
 }
 
-SourceManager::MediaTypes SourceManager::nextSourceType() const
+SourceManager::MediaTypes SourceManager::nextSourceType(int seek) const
 {
     return NONE;
 }
 
-SourceManager::MediaTypes SourceManager::prevSourceType() const
+SourceManager::MediaTypes SourceManager::prevSourceType(int seek) const
 {
     return NONE;
 }

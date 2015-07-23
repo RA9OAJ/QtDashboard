@@ -14,6 +14,8 @@ Rectangle {
     signal loaded
     signal ended
     signal __error(int _error, string _errorString)
+    signal started
+    signal paused
 
     AVPlayer {
         id: player
@@ -70,7 +72,7 @@ Rectangle {
         triggeredOnStart: false
         running: false
 
-        onTriggered: {player.pause(); player.seek(0); player.muted = _muted;}
+        onTriggered: {player.pause(); player.seek(0); player.muted = _muted; loaded()}
     }
 
     function setSource(_path) {
@@ -86,5 +88,22 @@ Rectangle {
     function muted(flag) {
         _muted = flag
         player.muted = flag
+    }
+
+    function start() {
+        if(player.error === AVPlayer.NoError && _paused === true) {
+            player.play()
+            started()
+        }
+    }
+
+    function pause() {
+        if(player.error === AVPlayer.NoError && _paused != true)
+            player.pause()
+    }
+
+    function stop() {
+        player.stop()
+        ended()
     }
 }

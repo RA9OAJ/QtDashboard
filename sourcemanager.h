@@ -32,8 +32,8 @@ public:
     QString source() const;
 
     MediaTypes sourceType() const;
-    MediaTypes nextSourceType() const;
-    MediaTypes prevSourceType() const;
+    MediaTypes nextSourceType(int seek = 0) const;
+    MediaTypes prevSourceType(int seek = 0) const;
     int size() const;
 
 signals:
