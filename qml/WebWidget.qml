@@ -14,6 +14,7 @@ Item {
 
     signal loaded
     signal ended
+    signal started
 
     WebView {
             id: web1
@@ -23,44 +24,53 @@ Item {
             onLoadingChanged: {
                 if(loadRequest.status === WebView.LoadSucceededStatus && loadProgress === 100) {
                     loaded()
-                    if(contentHeight > height) {
-                        tmr.stop()
-                        tmr.start()
-                        web1.contentY = 0
-                    }
-                    else if(contentHeight <= height) {
+                    contentY = 0
+                    if(contentHeight <= height) {
                         ended()
                     }
                 }
             }
         }
 
+    MouseArea {
+        id: mouse_area
+        width: parent.width
+        height: parent.height
 
-    Item {
-        Timer {
-            id: tmr
-            interval: 50
-            running: false
-            repeat: true
-            onTriggered: {
-                web1.flick(0,-67)
-                if(web1.contentY >= web1.contentHeight - height) {
-                    tmr.stop()
-                    ended()
-                    tmr1.start()
-                }
+        onPressed: {
+            pause()
+            visible = false
+        }
+    }
+
+    Timer {
+        id: tmr
+        interval: 70
+        running: false
+        repeat: true
+        onTriggered: {
+            web1.flick(0,-67)
+            if(web1.contentY >= web1.contentHeight - height) {
+                tmr.stop()
+                ended()
             }
         }
+    }
 
-        Timer {
-            id: tmr1
-            interval: 30000
-            running: false
-            repeat:false
-            triggeredOnStart: false
-            onTriggered: {
-                webWidget.visible = false
-                web1.contentY = 0
+    Timer {
+        id: tmr1
+        interval: 10000
+        running: false
+        repeat: false
+        triggeredOnStart: false
+
+        onTriggered: {
+            if(web1.contentY >= web1.contentHeight - height) {
+                ended()
+            }
+            else {
+                parent.start()
+                mouse_area.visible = true
             }
         }
     }
@@ -69,5 +79,26 @@ Item {
     {
         web1.url = _path;
         source = _path;
+    }
+
+    function start()
+    {
+        if(web1.loadProgress === 100 && web1.contentHeight > height) {
+            tmr.stop()
+            tmr.start()
+            tmr1.stop()
+        }
+    }
+
+    function pause()
+    {
+        tmr.stop()
+        tmr1.start()
+    }
+
+    function stop()
+    {
+        pause()
+        ended()
     }
 }

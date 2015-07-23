@@ -50,10 +50,16 @@ ApplicationWindow {
                 }
             }
 
+            onXChanged: {
+                if(x == main_frame.x)
+                    web.start()
+            }
+
             Behavior on x {
                 SpringAnimation {
                     spring: 2
                     damping: 0.35
+
                 }
             }
 
