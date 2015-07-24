@@ -22,6 +22,7 @@ Item {
     }
 
     Component.onCompleted: {
+        srcmanager.readXmlSourceList("/home/user/list.xml")
         createObject()
     }
 

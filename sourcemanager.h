@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QString>
+#include <QXmlStreamReader>
+#include <QFile>
+#include <QDebug>
 
 class SourceManager : public QObject
 {
@@ -44,12 +47,14 @@ signals:
     void sourceTypeChanged(MediaTypes type);
     void nextSourceTypeChanged(MediaTypes type);
     void sizeChanged();
+    void sourceListRead();
 
 public slots:
     void goNext();
     void goPrev();
     void nextLoaded();
     void nextError();
+    void readXmlSourceList(const QString &path);
 
 private:
     int _cur_id;
