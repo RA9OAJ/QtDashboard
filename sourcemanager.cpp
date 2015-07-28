@@ -3,6 +3,7 @@
 SourceManager::SourceManager(QObject *parent) :
     QObject(parent)
 {
+    _cur_id = 0;
     QDir config_path(QDir::homePath()+"/.config/QtDashboard");
     _config_path = config_path.absolutePath();
     if(!config_path.exists())
@@ -27,7 +28,7 @@ SourceManager::SourceManager(QObject *parent) :
 
 QString SourceManager::source() const
 {
-    return "file:///home/user/1.mp4";//_source;
+    return getSource(_cur_id).value("source");
 }
 
 SourceManager::Errors SourceManager::error() const
@@ -54,7 +55,25 @@ QString SourceManager::errorString() const
 
 SourceManager::MediaTypes SourceManager::sourceType() const
 {
-    return VIDEO;
+    MediaTypes type;
+    QString str = getSource(_cur_id).value("type");
+    if(str == "web")
+        type = WEB;
+    else if(str == "audio")
+        type = AUDIO;
+    else if(str == "video")
+        type = VIDEO;
+    else if(str == "text")
+        type = TEXT;
+    else if(str == "image")
+        type = IMAGE;
+    else if(str == "widget")
+        type = WIDGET;
+    else if(str == "user_widget")
+        type = USER_WIDGET;
+    else type = NONE;
+
+    return type;
 }
 
 SourceManager::MediaTypes SourceManager::nextSourceType(int seek) const
@@ -69,7 +88,12 @@ SourceManager::MediaTypes SourceManager::prevSourceType(int seek) const
 
 int SourceManager::size() const
 {
-    return 1;
+    int count = 0;
+    foreach (int id, sections.keys()) {
+        count += sections.value(id).sources.size();
+    }
+
+    return count;
 }
 
 void SourceManager::goNext()
@@ -222,6 +246,30 @@ void SourceManager::setErrors(SourceManager::Errors _e)
     _error = _e;
     if(_error != NO_ERROR)
         emit errorChanget();
+}
+
+const Source SourceManager::getSource(int id) const
+{
+    int id_section, count;
+    id_section = count = 0;
+    int id_source = id;
+
+    QList<int> keys = sections.keys();
+    qSort(keys.begin(),keys.end());
+
+    foreach (int cur_id, keys) {
+        count += sections.value(cur_id).sources.size();
+        if(id < count) {
+            id_section = cur_id;
+            break;
+        }
+        else id_source = id - count;
+    }
+
+    QList<int> source_keys = sections.value(id_section).sources.keys();
+    qSort(source_keys.begin(),source_keys.end());
+
+    return sections.value(id_section).sources.value(source_keys.value(id_source));
 }
 
 

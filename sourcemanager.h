@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QMap>
+#include <QList>
 
 #include "Section.h"
 
@@ -83,6 +84,7 @@ public slots:
 private:
     bool createDefaultConfig(const QString &dir);
     void setErrors(Errors _e);
+    const Source getSource(int id) const;
 
     int _cur_id;
     bool _audio;
@@ -94,7 +96,6 @@ private:
     qreal _volume;
 
     QMultiMap<int, Section> sections;
-
 };
 
 #endif // SORCEMANAGER_H
