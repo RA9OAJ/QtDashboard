@@ -16,4 +16,5 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    sourcemanager.h
+    sourcemanager.h \
+    Section.h
