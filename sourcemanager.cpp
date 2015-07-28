@@ -106,7 +106,7 @@ void SourceManager::readXmlSourceList(const QString &path)
     QXmlStreamReader reader(fl);
     QString cur_element;
     Areas area = ROOT;
-    int cur_section = -1;
+    Section section;
 
     while(!reader.atEnd())
     {
@@ -119,7 +119,10 @@ void SourceManager::readXmlSourceList(const QString &path)
         else if(token == QXmlStreamReader::EndElement)
         {
             if(cur_element == "section" && area == SECTION)
+            {
                 area = LIST;
+                sections.insert(section.priority,section);
+            }
             else if(cur_element == "list" && area == LIST)
                 area = ROOT;
         }
@@ -129,9 +132,8 @@ void SourceManager::readXmlSourceList(const QString &path)
                 area = LIST;
             else if(cur_element == "section")
             {
+                section.clear();
                 area = SECTION;
-                Section section;
-
                 if(!reader.attributes().isEmpty())
                 {
                     QXmlStreamAttributes attributes = reader.attributes();
@@ -144,17 +146,6 @@ void SourceManager::readXmlSourceList(const QString &path)
                 }
 
                 section.priority = section.attribs.value("priority","5").toInt();
-                section.id = section.attribs.value("id","-1").toInt();
-
-                if(section.id == -1)
-                {
-                    setErrors(SOURCE_ERROR);
-                    qDebug()<<tr("Could not find a mandatory attribute 'id' within the structure 'section'");
-                    return;
-                }
-
-                cur_section = section.id;
-                sections.insert(section.id,section);
                 continue;
             }
 
@@ -163,18 +154,15 @@ void SourceManager::readXmlSourceList(const QString &path)
             case LIST:
                 continue;
             case SECTION:
-                if(cur_element == "title")
+                if(cur_element == "source")
                 {
-                    sections[cur_section].title = reader.text().toString();
-                }
-                else if(cur_element == "source")
-                {
-                    if(!reader.attributes().isEmpty())
+                    if(!reader.attributes().isEmpty() || reader.text().isEmpty())
                     {
                         QXmlStreamAttributes attributes = reader.attributes();
                         QXmlStreamAttributes::iterator it = attributes.begin();
                         Source source;
 
+                        source.insert("source",reader.text().toString());
                         while(it != attributes.end())
                         {
                             source.insert(it->name().toString().toLower(),it->value().toString());
@@ -186,12 +174,13 @@ void SourceManager::readXmlSourceList(const QString &path)
                             qDebug()<<tr("Could not find a mandatory attribute 'id' within the structure 'source'");
                             continue;
                         }
-
-                        sections[cur_section].sources.insert(source.value("id").toInt(),source);
+                        source.insert("source",reader.readElementText());
+                        section.sources.insert(source.value("id").toInt(),source);
                     }
                     else qDebug()<<tr("Could not find a mandatory attribute 'id' within the structure 'source'");
                 }
-                else qDebug()<<tr("Invalid element '%1' within the structure 'section'").arg(reader.name().toString());
+                else if(cur_element == "title")
+                    section.title = reader.readElementText();
                 break;
             default:
                 continue;
@@ -205,6 +194,8 @@ void SourceManager::readXmlSourceList(const QString &path)
         qDebug()<<reader.errorString();
     }
     else emit sourceListRead();
+
+    fl->close();
 }
 
 bool SourceManager::createDefaultConfig(const QString &dir)

@@ -7,12 +7,21 @@
 typedef QMap<QString, QString> Source;
 
 struct Section {
-    int id;
     int priority;
     QString title;
     QMap<QString, QString> attribs;
 
     QMap<int,Source> sources;
+
+    Section() {clear();}
+
+    void clear()
+    {
+        priority = 5;
+        title.clear();
+        attribs.clear();
+        sources.clear();
+    }
 };
 
 #endif // SECTION_H

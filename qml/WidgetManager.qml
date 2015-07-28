@@ -19,11 +19,13 @@ Item {
 
     SourceManager {
         id: srcmanager
+        onSourceListRead: {
+            createObject()
+        }
     }
 
     Component.onCompleted: {
         srcmanager.readXmlSourceList("/home/user/list.xml")
-        createObject()
     }
 
     function createObject(cache){

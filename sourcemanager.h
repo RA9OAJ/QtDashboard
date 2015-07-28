@@ -93,7 +93,7 @@ private:
     int _visibilityInterval;
     qreal _volume;
 
-    QMap<int, Section> sections;
+    QMultiMap<int, Section> sections;
 
 };
 
