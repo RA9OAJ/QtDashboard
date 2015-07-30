@@ -7,9 +7,10 @@ Rectangle {
     height: parent.height  - parent.border.width * 2
     anchors.centerIn: parent
 
-    property var source: ""
-    property var _paused: true
-    property var _muted: false
+    property alias source: player.source
+    property bool _paused: true
+    property alias muted: player.muted
+    property alias volume: player.volume
 
     signal loaded
     signal ended
@@ -67,32 +68,38 @@ Rectangle {
 
     Timer {
         id: tmr
-        interval: 200
+        interval: 20
         repeat: false
         triggeredOnStart: false
         running: false
 
-        onTriggered: {player.pause(); player.seek(0); player.muted = _muted; loaded()}
+        onTriggered: {player.pause(); player.seek(0); loaded()}
+    }
+
+    Item {
+        id: internal
+
+        property bool _mute: false
+        property real _volume: 1.0
     }
 
     function setSource(_path) {
         source = _path
         player.source = _path
 
+        internal._mute = muted
+        internal._volume = player.volume
+        player.volume = 0.0
         player.muted = true
         player.play()
         tmr.start()
-
-    }
-
-    function muted(flag) {
-        _muted = flag
-        player.muted = flag
     }
 
     function start() {
         if(player.error === AVPlayer.NoError && _paused === true) {
             player.play()
+            player.muted = internal._mute
+            player.volume = internal._volume
             started()
         }
     }

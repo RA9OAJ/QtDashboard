@@ -12,7 +12,8 @@ ApplicationWindow {
     visibility: "FullScreen"
     color: "#CCCCCC"
 
-    property var web: Null
+    property var widget_manager: Null
+    property bool flag: false
 
     Image {
         width: parent.width
@@ -29,7 +30,7 @@ ApplicationWindow {
         }
 
         Rectangle {
-            x: -10000
+            x: (-50 - (main_frame.x + main_frame.width))
             y: main_frame.y
             id: frame
             width: main_frame.width
@@ -44,15 +45,20 @@ ApplicationWindow {
                 main.title = component.errorString()
                 if (component.status === Component.Ready) {
                     var childRec = component.createObject(frame);
-                    web = childRec;
-                    web.ended.connect(setHello);
-                    web.loaded.connect(showMain);
+                    widget_manager = childRec;
+                    widget_manager.ended.connect(setHello);
+                    widget_manager.loaded.connect(showMain);
                 }
             }
 
             onXChanged: {
                 if(x == main_frame.x)
-                    web.start()
+                    widget_manager.start()
+                if(x == -50 - (main_frame.x + main_frame.width) && flag)
+                {
+                    //widget_manager.stop()
+                    widget_manager.next()
+                }
             }
 
             Behavior on x {
@@ -117,10 +123,12 @@ ApplicationWindow {
 
     function setHello() {
         main.title = "Hello!!!"
+        flag = true
         frame.x = -50 - (frame.x + frame.width)
     }
 
     function showMain() {
         frame.x = main_frame.x
+        flag = false
     }
 }

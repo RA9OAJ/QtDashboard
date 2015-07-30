@@ -10,10 +10,14 @@ Item {
     height: parent.height  - parent.border.width * 2 - 1
     anchors.centerIn: parent
 
-    property var source: ""
+    property bool _paused: true
+    property bool muted: true
+    property real volume: 0.0
+    property string source: ""
 
     signal loaded
     signal ended
+    signal __error(int _error, string _errorString)
     signal started
 
     WebView {

@@ -3,7 +3,6 @@
 SourceManager::SourceManager(QObject *parent) :
     QObject(parent)
 {
-    _cur_id = 0;
     QDir config_path(QDir::homePath()+"/.config/QtDashboard");
     _config_path = config_path.absolutePath();
     if(!config_path.exists())
@@ -22,6 +21,12 @@ SourceManager::SourceManager(QObject *parent) :
         setErrors(CONFIG_ERROR);
         qDebug()<<tr("The configuration file is not found. Application will be closed.");
     }
+
+    _cur_id = 0;
+    _mute = false;
+    _volume = 1.0;
+    _visibilityInterval = 30;
+    _loop = true;
 
     setErrors(NO_ERROR);
 }
@@ -76,16 +81,6 @@ SourceManager::MediaTypes SourceManager::sourceType() const
     return type;
 }
 
-SourceManager::MediaTypes SourceManager::nextSourceType(int seek) const
-{
-    return NONE;
-}
-
-SourceManager::MediaTypes SourceManager::prevSourceType(int seek) const
-{
-    return NONE;
-}
-
 int SourceManager::size() const
 {
     int count = 0;
@@ -96,24 +91,65 @@ int SourceManager::size() const
     return count;
 }
 
+bool SourceManager::loop() const
+{
+    return _loop;
+}
+
+void SourceManager::setLoop(bool arg)
+{
+    if(_loop != arg)
+    {
+        _loop = arg;
+        emit loopChanged(_loop);
+    }
+}
+
+int SourceManager::current() const
+{
+    return _cur_id;
+}
+
 void SourceManager::goNext()
 {
+    for(int i = _cur_id + 1;  i <= size() || i != _cur_id; i++)
+    {
+        if(i == size() && _loop)
+            i = 0;
 
+        if(!blacklist.contains(i))
+        {
+            setCurrent(i);
+            break;
+        }
+    }
 }
 
 void SourceManager::goPrev()
 {
+    for(int i = _cur_id - 1; i >= -1 || i != _cur_id; i--)
+    {
+        if(i < 0 && _loop)
+            i = size() - 1;
 
+        if(!blacklist.contains(i))
+        {
+            setCurrent(i);
+            break;
+        }
+    }
 }
 
-void SourceManager::nextLoaded()
+void SourceManager::sourceLoaded()
 {
-
+    if(blacklist.contains(_cur_id))
+        blacklist.removeOne(_cur_id);
 }
 
-void SourceManager::nextError()
+void SourceManager::sourceError()
 {
-
+    if(!blacklist.contains(_cur_id))
+        blacklist.append(_cur_id);
 }
 
 void SourceManager::readXmlSourceList(const QString &path)
@@ -123,7 +159,7 @@ void SourceManager::readXmlSourceList(const QString &path)
     if(!fl->open(QFile::ReadOnly | QFile::Text))
     {
         setErrors(SOURCE_NOT_FOUND);
-        qDebug()<<"readXmlSourceList: "<<fl->errorString();
+        qDebug()<<"readXmlSourceList:"<<fl->errorString();
         return;
     }
 
@@ -220,6 +256,139 @@ void SourceManager::readXmlSourceList(const QString &path)
     else emit sourceListRead();
 
     fl->close();
+
+    emit sizeChanged(size());
+}
+
+void SourceManager::setCurrent(int arg)
+{
+    if(_cur_id != arg && arg < size() && arg >= 0)
+    {
+        _cur_id = arg;
+        emit sourceChanget(_cur_id);
+    }
+}
+
+qreal SourceManager::volume() const
+{
+    if(_cur_id < size())
+        return getSource(_cur_id).value("volume",QString::number(_volume)).toFloat();
+
+    return _volume;
+}
+
+int SourceManager::timer() const
+{
+    if(_cur_id < size())
+        return getSource(_cur_id).value("timer",QString::number(_visibilityInterval)).toInt();
+
+    return 0;
+}
+
+bool SourceManager::show() const
+{
+    if(_cur_id < size())
+    {
+        QString val = getSource(_cur_id).value("video","true").toLower();
+        if(val == "true" || val == "1")
+            return true;
+    }
+
+    return true;
+}
+
+QString SourceManager::title() const
+{
+    if(_cur_id < size())
+        return getSource(_cur_id).value("title");
+
+    return QString();
+}
+
+int SourceManager::startPosition() const
+{
+    if(_cur_id < size())
+        return getSource(_cur_id).value("start","0").toInt();
+
+    return 0;
+}
+
+int SourceManager::stopPosition() const
+{
+    if(_cur_id < size())
+        return getSource(_cur_id).value("stop","0").toInt();
+
+    return 0;
+}
+
+bool SourceManager::mute() const
+{
+    if(_cur_id < size())
+    {
+        QString val = getSource(_cur_id).value("mute", _mute ? "true" : "false").toLower();
+        if(val == "true" || val == "1")
+            return true;
+    }
+
+    return false;
+}
+
+QDateTime SourceManager::startPublicDate() const
+{
+    if(_cur_id < size())
+    {
+        QDateTime dt;
+        dt.fromString(getSource(_cur_id).value("start_public",QDateTime::currentDateTime().toString("dd-MM-yyyy HH:mm:ss")));
+        return dt;
+    }
+
+    return QDateTime::currentDateTime();
+}
+
+QDateTime SourceManager::endPublicDate() const
+{
+    if(_cur_id < size())
+    {
+        QDateTime dt;
+        dt.fromString(getSource(_cur_id).value("start_public",QDateTime::currentDateTime().addYears(100).toString("dd-MM-yyyy HH:mm:ss")));
+        return dt;
+    }
+
+    return QDateTime::currentDateTime().addYears(100);
+}
+
+bool SourceManager::showSectionTitle() const
+{
+    if(_cur_id < size())
+    {
+        int id_section, count;
+        id_section = count = 0;
+
+        QList<int> keys = sections.keys();
+        qSort(keys.begin(),keys.end());
+
+        foreach (int cur_id, keys) {
+            count += sections.value(cur_id).sources.size();
+            if(_cur_id < count) {
+                id_section = cur_id;
+                break;
+            }
+        }
+
+        QString val = sections.value(id_section).attribs.value("visible","true").toLower();
+        if(val == "true" || val == "1")
+            return true;
+    }
+
+    return false;
+}
+
+QString SourceManager::sectionTitle() const
+{
+    if(_cur_id < size())
+        return getSection(_cur_id).title;
+
+    return QString();
 }
 
 bool SourceManager::createDefaultConfig(const QString &dir)
@@ -243,9 +412,11 @@ bool SourceManager::createDefaultConfig(const QString &dir)
 
 void SourceManager::setErrors(SourceManager::Errors _e)
 {
-    _error = _e;
-    if(_error != NO_ERROR)
-        emit errorChanget();
+    if(_error != _e && _e != NO_ERROR)
+    {
+        _error = _e;
+        emit errorChanget(_error);
+    }
 }
 
 const Source SourceManager::getSource(int id) const
@@ -270,6 +441,26 @@ const Source SourceManager::getSource(int id) const
     qSort(source_keys.begin(),source_keys.end());
 
     return sections.value(id_section).sources.value(source_keys.value(id_source));
+}
+
+const Section SourceManager::getSection(int id) const
+{
+    int id_section, count;
+    id_section = count = 0;
+
+    QList<int> keys = sections.keys();
+    qSort(keys.begin(),keys.end());
+
+    foreach (int cur_id, keys) {
+        count += sections.value(cur_id).sources.size();
+        if(id < count) {
+            id_section = cur_id;
+            break;
+        }
+    }
+
+    Section section = sections.value(id_section);
+    return section;
 }
 
 

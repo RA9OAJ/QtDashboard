@@ -5,7 +5,7 @@ Item {
     width: parent.width
     height: parent.height
 
-    property var objectsOnCache: 1
+    property int objectsOnCache: 1
 
     signal loaded //генерится при полной загрузке материала
     signal ended //генерится при таймауте тамера времени показа материала
@@ -14,7 +14,16 @@ Item {
 
     Item {
         id: internal
-        property  list<QtObject> objectCache: [Item{objectName: "empty";}]
+        property  variant objectCache: []
+        property variant o2: []
+
+        function isLoaded() {
+            console.log("Next is Load!")
+        }
+
+        function isError() {
+            console.log("Mext not Load :(")
+        }
     }
 
     SourceManager {
@@ -48,37 +57,70 @@ Item {
             if(component != null){
                 if (component.status === Component.Ready) {
                     var childRec = component.createObject(parent);
-                    var array = new Array(0)
-                    if(internal.objectCache[0].objectName != "empty")
-                        array.push(internal.objectCache)
+                    var array = new Array
+                    if(internal.objectCache.length != 0)
+                        array = internal.objectCache
                     var num = array.length
                     array[num] = childRec;
-                    array[num].setSource(srcmanager.source);
-                    array[num].ended.connect(ended);
-                    array[num].loaded.connect(loaded);
-                    array[num].started.connect(started)
+
+                    if(num == 0) {
+                        array[0].volume = srcmanager.volume;
+                        array[0].muted = srcmanager.mute
+                        array[0].ended.connect(ended);
+                        array[0].loaded.connect(loaded);
+                        array[0].started.connect(started)
+                        array[0].setSource(srcmanager.source);
+                        srcmanager.goNext()
+                    }
+                    else {
+                        array[num].visible = false
+                        array[num].volume = srcmanager.volume;
+                        array[num].muted = srcmanager.mute
+                        array[num].loaded.connect(internal.isLoaded)
+                        array[num].__error.connect(internal.isError)
+                        array[num].setSource(srcmanager.source)
+                    }
+
                     internal.objectCache = array
-                    console.log(internal.objectCache[num])
                 }
             }
         }
     }
 
     function start() {
-        if(internal.objectCache[0].objectName != "empty") {
+        if(internal.objectCache.length) {
             internal.objectCache[0].start()
+            createObject()
         }
     }
 
     function pause() {
-        if(internal.objectCache[0].objectName != "empty") {
+        if(internal.objectCache.length) {
             internal.objectCache[0].pause()
         }
     }
 
     function stop() {
-        if(internal.objectCache[0].objectName != "empty") {
+        if(internal.objectCache.length) {
             internal.objectCache[0].stop()
+        }
+    }
+
+    function next() {
+        if(internal.objectCache.length) {
+            var array = new Array(0)
+            array = internal.objectCache
+            array.shift().destroy()
+
+            if(array.length > 0) {
+                array[0].ended.connect(ended)
+                array[0].loaded.connect(loaded)
+                array[0].started.connect(started)
+                array[0].visible = true
+                srcmanager.goNext()
+                loaded()
+            }
+            internal.objectCache = array
         }
     }
 }

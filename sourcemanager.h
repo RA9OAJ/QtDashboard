@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QXmlStreamReader>
+#include <QDateTime>
 #include <QFile>
 #include <QDebug>
 #include <QDir>
@@ -47,55 +48,84 @@ public:
         SECTION
     };
 
+    Q_PROPERTY(int current READ current WRITE setCurrent NOTIFY sourceChanget)
     Q_PROPERTY(QString source READ source NOTIFY sourceChanget)
-    Q_PROPERTY(int sourceType READ sourceType NOTIFY sourceTypeChanged)
-    Q_PROPERTY(int nextSourceType READ nextSourceType NOTIFY nextSourceTypeChanged)
+    Q_PROPERTY(int sourceType READ sourceType)
     Q_PROPERTY(int size READ size NOTIFY sizeChanged)
     Q_PROPERTY(Errors error READ error NOTIFY errorChanget)
     Q_PROPERTY(QString errorString READ errorString)
+    Q_PROPERTY(bool loop READ loop WRITE setLoop NOTIFY loopChanged)
+
+    Q_PROPERTY(qreal volume READ volume NOTIFY volumeChanged)
+    Q_PROPERTY(int  timer READ timer)
+    Q_PROPERTY(bool show READ show)
+    Q_PROPERTY(QString title READ title)
+    Q_PROPERTY(int startPosition READ startPosition)
+    Q_PROPERTY(int stopPosition READ stopPosition)
+    Q_PROPERTY(bool mute READ mute)
+    Q_PROPERTY(QDateTime startPublicDate READ startPublicDate)
+    Q_PROPERTY(QDateTime endPublicDate READ endPublicDate)
+    Q_PROPERTY(bool showSectionTitle READ showSectionTitle)
+    Q_PROPERTY(QString sectionTitle READ sectionTitle)
 
     QString source() const;
     Errors error() const;
     QString errorString() const;
 
     MediaTypes sourceType() const;
-    MediaTypes nextSourceType(int seek = 0) const;
-    MediaTypes prevSourceType(int seek = 0) const;
     int size() const;
+    bool loop() const;
+    void setLoop(bool arg);
+    int current() const;
+    void setCurrent(int arg);
+
+    qreal volume() const;
+    int timer() const;
+    bool show() const;
+    QString title() const;
+    int startPosition() const;
+    int stopPosition() const;
+    bool mute() const;
+    QDateTime startPublicDate() const;
+    QDateTime endPublicDate() const;
+    bool showSectionTitle() const;
+    QString sectionTitle() const;
 
 signals:
-    void sourceChanget();
-    void nextSourceChanget();
-    void volumeChanget();
-    void soppedSource();
-    void sourceTypeChanged(MediaTypes type);
-    void nextSourceTypeChanged(MediaTypes type);
-    void sizeChanged();
+    void sourceChanget(int arg);
+    void volumeChanged(qreal arg);
+    void stoppedSource();
+    void sizeChanged(int arg);
     void sourceListRead();
-    void errorChanget();
+    void errorChanget(int arg);
+    void loopChanged(bool arg);
 
 public slots:
     void goNext();
     void goPrev();
-    void nextLoaded();
-    void nextError();
+    void sourceLoaded();
+    void sourceError();
     void readXmlSourceList(const QString &path);
 
 private:
     bool createDefaultConfig(const QString &dir);
     void setErrors(Errors _e);
     const Source getSource(int id) const;
+    const Section getSection(int id) const;
 
     int _cur_id;
-    bool _audio;
+    bool _loop;
     Errors _error;
     QString _source;
     QString _type;
     QString _config_path;
     int _visibilityInterval;
+    bool _mute;
     qreal _volume;
 
     QMultiMap<int, Section> sections;
+    QList<int> blacklist;
+
 };
 
 #endif // SORCEMANAGER_H
