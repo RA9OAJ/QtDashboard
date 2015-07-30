@@ -13,7 +13,8 @@ Item {
     property bool _paused: true
     property bool muted: true
     property real volume: 0.0
-    property string source: ""
+    property alias source: web1.url
+    property alias timeout: tmr2.interval
 
     signal loaded
     signal ended
@@ -30,7 +31,7 @@ Item {
                     loaded()
                     contentY = 0
                     if(contentHeight <= height) {
-                        ended()
+                        tmr2.start()
                     }
                 }
             }
@@ -43,6 +44,7 @@ Item {
 
         onPressed: {
             pause()
+            tmr2.stop()
             visible = false
         }
     }
@@ -56,7 +58,7 @@ Item {
             web1.flick(0,-67)
             if(web1.contentY >= web1.contentHeight - height) {
                 tmr.stop()
-                ended()
+                tmr2.start()
             }
         }
     }
@@ -70,7 +72,7 @@ Item {
 
         onTriggered: {
             if(web1.contentY >= web1.contentHeight - height) {
-                ended()
+                tmr2.start()
             }
             else {
                 parent.start()
@@ -79,10 +81,19 @@ Item {
         }
     }
 
+    Timer {
+        id: tmr2
+        interval: 30000
+        running: false
+        repeat: false
+        triggeredOnStart: false
+
+        onTriggered: ended()
+    }
+
     function setSource(_path)
     {
         web1.url = _path;
-        source = _path;
     }
 
     function start()

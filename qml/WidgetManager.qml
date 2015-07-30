@@ -56,7 +56,7 @@ Item {
 
             if(component != null){
                 if (component.status === Component.Ready) {
-                    var childRec = component.createObject(parent);
+                    var childRec = component.createObject(parent)
                     var array = new Array
                     if(internal.objectCache.length != 0)
                         array = internal.objectCache
@@ -64,18 +64,20 @@ Item {
                     array[num] = childRec;
 
                     if(num == 0) {
-                        array[0].volume = srcmanager.volume;
+                        array[0].volume = srcmanager.volume
                         array[0].muted = srcmanager.mute
-                        array[0].ended.connect(ended);
-                        array[0].loaded.connect(loaded);
+                        array[0].timeout = srcmanager.timer * 1000
+                        array[0].ended.connect(ended)
+                        array[0].loaded.connect(loaded)
                         array[0].started.connect(started)
-                        array[0].setSource(srcmanager.source);
+                        array[0].setSource(srcmanager.source)
                         srcmanager.goNext()
                     }
                     else {
                         array[num].visible = false
-                        array[num].volume = srcmanager.volume;
+                        array[num].volume = srcmanager.volume
                         array[num].muted = srcmanager.mute
+                        array[num].timeout = srcmanager.timer * 1000
                         array[num].loaded.connect(internal.isLoaded)
                         array[num].__error.connect(internal.isError)
                         array[num].setSource(srcmanager.source)

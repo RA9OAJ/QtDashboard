@@ -11,6 +11,7 @@ Rectangle {
     property bool _paused: true
     property alias muted: player.muted
     property alias volume: player.volume
+    property int timeout: 0
 
     signal loaded
     signal ended

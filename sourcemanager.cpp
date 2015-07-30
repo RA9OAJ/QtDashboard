@@ -282,7 +282,7 @@ int SourceManager::timer() const
     if(_cur_id < size())
         return getSource(_cur_id).value("timer",QString::number(_visibilityInterval)).toInt();
 
-    return 0;
+    return _visibilityInterval;
 }
 
 bool SourceManager::show() const
