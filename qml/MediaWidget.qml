@@ -7,6 +7,7 @@ Rectangle {
     height: parent.height  - parent.border.width * 2
     anchors.centerIn: parent
 
+    readonly property string widget_type: "VIDEO"
     property alias source: player.source
     property bool _paused: true
     property alias muted: player.muted

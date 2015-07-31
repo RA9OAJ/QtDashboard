@@ -10,6 +10,7 @@ Item {
     height: parent.height  - parent.border.width * 2 - 1
     anchors.centerIn: parent
 
+    readonly property string widget_type: "WEB"
     property bool _paused: true
     property bool muted: true
     property real volume: 0.0
