@@ -30,9 +30,6 @@ Item {
                 if(loadRequest.status === WebView.LoadSucceededStatus && loadProgress === 100) {
                     loaded()
                     contentY = 0
-                    if(contentHeight <= height) {
-                        tmr2.start()
-                    }
                 }
             }
         }
@@ -44,7 +41,6 @@ Item {
 
         onPressed: {
             pause()
-            tmr2.stop()
             visible = false
         }
     }
@@ -98,16 +94,24 @@ Item {
 
     function start()
     {
-        if(web1.loadProgress === 100 && web1.contentHeight > height) {
-            tmr.stop()
-            tmr.start()
-            tmr1.stop()
+        if(web1.loadProgress === 100) {
+            if(web1.contentHeight > height)
+            {
+                tmr.stop()
+                tmr.start()
+                tmr1.stop()
+            }
+            else {
+                tmr2.start()
+            }
         }
+
     }
 
     function pause()
     {
         tmr.stop()
+        tmr2.stop()
         tmr1.start()
     }
 

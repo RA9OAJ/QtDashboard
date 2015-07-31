@@ -112,7 +112,8 @@ Item {
         if(internal.objectCache.length) {
             var array = new Array(0)
             array = internal.objectCache
-            array.shift().destroy()
+            array.shift().destroy(10)
+            gc()
 
             if(array.length > 0) {
                 array[0].ended.connect(ended)
