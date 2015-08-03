@@ -40,9 +40,6 @@ Item {
 
     SourceManager {
         id: srcmanager
-        onSourceListRead: {
-            createObject()
-        }
     }
 
     Component.onCompleted: {
@@ -60,13 +57,18 @@ Item {
             case SourceManager.WEB:
                 childRec = internal.getFreeWidget("WEB")
                 if(childRec == null)
-                    component = Qt.createComponent("WebWidget.qml");
+                    component = Qt.createComponent("WebWidget.qml")
+                break
+            case SourceManager.IMAGE:
+                childRec = internal.getFreeWidget("IMAGE")
+                if(childRec == null)
+                    component = Qt.createComponent("ImageWidget.qml")
                 break
             case SourceManager.AUDIO:
             case SourceManager.VIDEO:
                 childRec = internal.getFreeWidget("WEB")
                 if(childRec == null)
-                    component = Qt.createComponent("MediaWidget.qml");
+                    component = Qt.createComponent("MediaWidget.qml")
                 break
             default:
                 break
@@ -74,6 +76,8 @@ Item {
 
             if(component != null && component.status === Component.Ready)
                 childRec = component.createObject(parent)
+            else if(component != null && component.status === Component.Error)
+                console.log(component.errorString)
 
             if(childRec != null) {
                 var array = new Array
@@ -131,16 +135,16 @@ Item {
             var array = new Array
             var free_windgets = new Array
             array = internal.busyWidgets
-
-            array[0].visible = false
-            array[0].ended.disconnect(ended)
-            array[0].loaded.disconnect(loaded)
-            array[0].started.disconnect(started)
-
             free_windgets = internal.freeWidgets
-            free_windgets.push(array.shift())
-            internal.freeWidgets = free_windgets
-            console.log(internal.freeWidgets.length)
+
+            if(array.length > 0) {
+                array[0].visible = false
+                array[0].ended.disconnect(ended)
+                array[0].loaded.disconnect(loaded)
+                array[0].started.disconnect(started)
+                free_windgets.push(array.shift())
+                internal.freeWidgets = free_windgets
+            }
 
             if(array.length > 0) {
                 array[0].ended.connect(ended)
@@ -154,5 +158,9 @@ Item {
             }
             internal.busyWidgets = array
         }
+    }
+
+    function run() {
+        createObject()
     }
 }

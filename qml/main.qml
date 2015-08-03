@@ -52,12 +52,15 @@ ApplicationWindow {
             }
 
             onXChanged: {
-                if(x == main_frame.x)
-                    widget_manager.start()
-                if(x == -50 - (main_frame.x + main_frame.width) && flag)
-                {
-                    //widget_manager.stop()
-                    widget_manager.next()
+                if(widget_manager != null) {
+                    if(x == main_frame.x)
+                        widget_manager.start()
+                    else if(x <= -50 - (main_frame.x + main_frame.width) && flag) {
+                        widget_manager.stop()
+                        widget_manager.next()
+                    }
+                    else if(x <= -50 - (main_frame.x + main_frame.width) && !flag)
+                        widget_manager.run()
                 }
             }
 

@@ -12,5 +12,6 @@
         <file alias="DateTimeWidget.qml">qml/DateTimeWidget.qml</file>
         <file alias="WidgetManager.qml">qml/WidgetManager.qml</file>
         <file alias="config.xml">config.xml</file>
+        <file alias="ImageWidget.qml">qml/ImageWidget.qml</file>
     </qresource>
 </RCC>

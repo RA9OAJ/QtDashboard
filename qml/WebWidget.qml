@@ -2,6 +2,7 @@ import QtQuick 2.1
 import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
 import QtWebKit 3.0
+import QtWebKit.experimental 1.0
 
 //----------------------WebWidget--------------------------------
 Item {
@@ -27,6 +28,11 @@ Item {
             width: parent.width
             height: parent.height
             url: "http://yandex.ru/"
+
+            experimental.preferences.pluginsEnabled: true
+            experimental.preferences.javascriptEnabled: true
+            experimental.preferences.navigatorQtObjectEnabled: true
+
             onLoadingChanged: {
                 if(loadRequest.status === WebView.LoadSucceededStatus && loadProgress === 100) {
                     loaded()
@@ -118,7 +124,9 @@ Item {
 
     function stop()
     {
-        pause()
+        tmr.stop()
+        tmr2.stop()
+        tmr1.stop()
         ended()
     }
 }
