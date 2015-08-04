@@ -5,6 +5,9 @@ SourceManager::SourceManager(QObject *parent) :
 {
     QDir config_path(QDir::homePath()+"/.config/QtDashboard");
     _config_path = config_path.absolutePath();
+
+    _status = LOADING;
+
     if(!config_path.exists())
     {
         if(!config_path.mkpath(config_path.absolutePath()))
@@ -22,13 +25,18 @@ SourceManager::SourceManager(QObject *parent) :
         qDebug()<<tr("The configuration file is not found. Application will be closed.");
     }
 
+    if(!loadXmlConfig(QDir::homePath()+"/.config/QtDashboard/config.xml"))
+        setErrors(CONFIG_ERROR);
+
     _cur_id = 0;
     _mute = false;
     _volume = 1.0;
     _visibilityInterval = 30;
     _loop = true;
 
-    setErrors(NO_ERROR);
+    _error = NO_ERROR;
+    _status = READY;
+    emit statusChanged(_status);
 }
 
 QString SourceManager::source() const
@@ -152,9 +160,30 @@ void SourceManager::sourceError()
         blacklist.append(_cur_id);
 }
 
-void SourceManager::readXmlSourceList(const QString &path)
+void SourceManager::readXmlSourceList(const QString &name)
 {
-    QFile *fl = new QFile(path);
+    QString filepath;
+    if(sources_dirs.size())
+    {
+        foreach (QString cur_dir, sources_dirs)
+        {
+            QDir dir(cur_dir);
+            if(!dir.exists())
+                continue;
+
+            dir.setFilter(QDir::Files);
+
+            QStringList filter;
+            filter<<QString("%1.xml").arg(name);
+            dir.setNameFilters(filter);
+
+            QList<QFileInfo> lst = dir.entryInfoList();
+            if(lst.size())
+                filepath = lst.value(0).absoluteFilePath();
+        }
+    }
+
+    QFile *fl = new QFile(filepath);
 
     if(!fl->open(QFile::ReadOnly | QFile::Text))
     {
@@ -255,7 +284,9 @@ void SourceManager::readXmlSourceList(const QString &path)
     }
     else emit sourceListRead();
 
-    fl->close();
+    if(fl->isOpen())
+        fl->close();
+    fl->deleteLater();
 
     emit sizeChanged(size());
 }
@@ -391,6 +422,11 @@ QString SourceManager::sectionTitle() const
     return QString();
 }
 
+SourceManager::Statuses SourceManager::status() const
+{
+    return _status;
+}
+
 bool SourceManager::createDefaultConfig(const QString &dir)
 {
     QFile fl(dir + "/config.xml");
@@ -410,12 +446,81 @@ bool SourceManager::createDefaultConfig(const QString &dir)
     return true;
 }
 
+bool SourceManager::loadXmlConfig(const QString &path)
+{
+    bool result = false;
+    QFile *fl = new QFile(path);
+    if(fl->open(QFile::ReadOnly | QFile::Text))
+    {
+        QXmlStreamReader reader(fl);
+        int cur_section = 0;
+        QString cur_element;
+
+        while(!reader.atEnd())
+        {
+            reader.readNext();
+
+            if(reader.isStartDocument())
+                continue;
+
+            if(reader.isEndElement())
+            {
+                if(cur_element == "global")
+                    --cur_section;
+            }
+            else if(reader.isStartElement())
+            {
+                cur_element = reader.name().toString().toLower();
+
+                switch(cur_section)
+                {
+                case 0:
+                    if(cur_element == "global")
+                        cur_section = 1;
+                    break;
+                case 1:
+                    if(cur_element == "sources")
+                        sources_dirs.append(reader.readElementText().split(";"));
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
+        if(!sources_dirs.isEmpty())
+        {
+            if(sources_dirs.indexOf("$CONFIG") != -1)
+                sources_dirs.replaceInStrings("$CONFIG",QDir::homePath() + "/.config/QtDashboard");
+            if(sources_dirs.indexOf("$HOME") != -1)
+                sources_dirs.replaceInStrings("$HOME",QDir::homePath());
+        }
+
+        if(reader.hasError())
+        {
+            result = false;
+            setErrors(CONFIG_ERROR);
+            qDebug()<<tr("Read configuration file error: %").arg(reader.errorString());
+        }
+        else result = true;
+    }
+    else qDebug()<<tr("Can't open configuration fil: %1").arg(fl->fileName());
+
+    if(fl->isOpen())
+        fl->close();
+    fl->deleteLater();
+
+    return result;
+}
+
 void SourceManager::setErrors(SourceManager::Errors _e)
 {
     if(_error != _e && _e != NO_ERROR)
     {
         _error = _e;
+        _status = ERROR;
         emit errorChanget(_error);
+        emit statusChanged(_status);
     }
 }
 

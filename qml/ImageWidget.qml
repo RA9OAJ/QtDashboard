@@ -25,7 +25,6 @@ Item {
         smooth: true
 
         onStatusChanged: {
-            console.log(img.status)
             if(img.status == Image.Ready)
                 loaded()
         }

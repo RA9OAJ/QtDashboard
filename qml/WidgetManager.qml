@@ -43,7 +43,7 @@ Item {
     }
 
     Component.onCompleted: {
-        srcmanager.readXmlSourceList("/home/user/list.xml")
+        srcmanager.readXmlSourceList("list")
     }
 
     function createObject(cache){

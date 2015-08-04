@@ -19,6 +19,7 @@ class SourceManager : public QObject
     Q_OBJECT
     Q_ENUMS(MediaTypes)
     Q_ENUMS(Errors)
+    Q_ENUMS(Statuses)
 
 public:
     explicit SourceManager(QObject *parent = 0);
@@ -42,6 +43,12 @@ public:
         SOURCE_NOT_FOUND
     };
 
+    enum Statuses {
+        LOADING,
+        READY,
+        ERROR
+    };
+
     enum Areas {
         ROOT,
         LIST,
@@ -55,6 +62,7 @@ public:
     Q_PROPERTY(Errors error READ error NOTIFY errorChanget)
     Q_PROPERTY(QString errorString READ errorString)
     Q_PROPERTY(bool loop READ loop WRITE setLoop NOTIFY loopChanged)
+    Q_PROPERTY(Statuses status READ status NOTIFY statusChanged)
 
     Q_PROPERTY(qreal volume READ volume NOTIFY volumeChanged)
     Q_PROPERTY(int  timer READ timer)
@@ -90,6 +98,7 @@ public:
     QDateTime endPublicDate() const;
     bool showSectionTitle() const;
     QString sectionTitle() const;
+    Statuses status() const;
 
 signals:
     void sourceChanget(int arg);
@@ -99,20 +108,23 @@ signals:
     void sourceListRead();
     void errorChanget(int arg);
     void loopChanged(bool arg);
+    void statusChanged(Statuses arg);
 
 public slots:
     void goNext();
     void goPrev();
     void sourceLoaded();
     void sourceError();
-    void readXmlSourceList(const QString &path);
+    void readXmlSourceList(const QString &name);
 
 private:
     bool createDefaultConfig(const QString &dir);
+    bool loadXmlConfig(const QString &path);
     void setErrors(Errors _e);
     const Source getSource(int id) const;
     const Section getSection(int id) const;
 
+    Statuses _status;
     int _cur_id;
     bool _loop;
     Errors _error;
@@ -122,6 +134,7 @@ private:
     int _visibilityInterval;
     bool _mute;
     qreal _volume;
+    QStringList sources_dirs;
 
     QMultiMap<int, Section> sections;
     QList<int> blacklist;
