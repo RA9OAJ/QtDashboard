@@ -71,7 +71,7 @@ Rectangle {
 
     Timer {
         id: tmr
-        interval: 20
+        interval: 500
         repeat: false
         triggeredOnStart: false
         running: false

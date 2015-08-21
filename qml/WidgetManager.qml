@@ -101,6 +101,9 @@ Item {
                     array[num].volume = srcmanager.volume
                     array[num].muted = srcmanager.mute
                     array[num].timeout = srcmanager.timer * 1000
+                    array[num].ended.disconnect(ended)
+                    array[num].loaded.disconnect(loaded)
+                    array[num].started.disconnect(started)
                     array[num].loaded.connect(internal.isLoaded)
                     array[num].__error.connect(internal.isError)
                     array[num].setSource(srcmanager.source)
@@ -142,6 +145,7 @@ Item {
                 array[0].ended.disconnect(ended)
                 array[0].loaded.disconnect(loaded)
                 array[0].started.disconnect(started)
+                array[0].stop()
                 free_windgets.push(array.shift())
                 internal.freeWidgets = free_windgets
             }
