@@ -47,6 +47,7 @@ Rectangle {
     }
 
     VideoOutput2 {
+            id: vo2
             width: parent.width
             height: parent.height
 
@@ -102,6 +103,9 @@ Rectangle {
             player.play()
             player.muted = internal._mute
             player.volume = internal._volume
+            vo2.width = vo2.parent.width
+            vo2.height = vo2.parent.height
+            vo2.scale = 1.0
             started()
         }
     }

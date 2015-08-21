@@ -125,7 +125,6 @@ ApplicationWindow {
     }
 
     function setHello() {
-        main.title = "Hello!!!"
         flag = true
         frame.x = -50 - (frame.x + frame.width)
     }
