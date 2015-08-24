@@ -71,12 +71,22 @@ Rectangle {
 
     Timer {
         id: tmr
-        interval: 500
+        interval: 10
         repeat: false
         triggeredOnStart: false
         running: false
 
-        onTriggered: {player.pause(); player.seek(0); loaded()}
+        onTriggered: {
+            console.log(player.status)
+            if(player.status === AVPlayer.Buffered) {
+                player.pause()
+                player.seek(0)
+                loaded()
+            }
+            else if(player.error === AVPlayer.NoError && player.status != AVPlayer.NoMedia) {
+                tmr.start()
+            }
+        }
     }
 
     Item {
