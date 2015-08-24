@@ -66,7 +66,7 @@ Item {
                 break
             case SourceManager.AUDIO:
             case SourceManager.VIDEO:
-                childRec = internal.getFreeWidget("WEB")
+                childRec = internal.getFreeWidget("VIDEO")
                 if(childRec == null)
                     component = Qt.createComponent("MediaWidget.qml")
                 break
