@@ -7,6 +7,7 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    //app.setOverrideCursor(Qt::BlankCursor);
 
     qmlRegisterType<SourceManager>("SourceManager",1,0,"SourceManager");
 

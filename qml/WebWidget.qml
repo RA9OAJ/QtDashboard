@@ -7,8 +7,8 @@ import QtWebKit.experimental 1.0
 //----------------------WebWidget--------------------------------
 Item {
     id: webWidget
-    width: parent.width - parent.border.width * 2 - 1
-    height: parent.height  - parent.border.width * 2 - 1
+    width: parent.width - parent.border.width * 2
+    height: parent.height  - parent.border.width * 2
     anchors.centerIn: parent
 
     readonly property string widget_type: "WEB"

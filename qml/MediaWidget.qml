@@ -77,7 +77,6 @@ Rectangle {
         running: false
 
         onTriggered: {
-            console.log(player.status)
             if(player.status === AVPlayer.Buffered) {
                 player.pause()
                 player.seek(0)
