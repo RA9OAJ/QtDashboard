@@ -9,7 +9,7 @@ RESOURCES += qml.qrc
 
 TARGET = qdashboard
 
-DESTDIR = ../usr/bin
+DESTDIR = ./usr/bin
 
 MOC_DIR        = build/moc_dir
 OBJECTS_DIR    = build/obj_dir
