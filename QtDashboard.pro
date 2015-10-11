@@ -3,7 +3,8 @@ TEMPLATE = app
 QT += qml quick widgets sql av
 
 SOURCES += main.cpp \
-    sourcemanager.cpp
+    sourcemanager.cpp \
+    processsharedbuffer.cpp
 
 RESOURCES += qml.qrc
 
@@ -25,4 +26,5 @@ include(deployment.pri)
 
 HEADERS += \
     sourcemanager.h \
-    Section.h
+    Section.h \
+    processsharedbuffer.h
