@@ -9,9 +9,11 @@ MyApplication::MyApplication(int &argc, char **argv, int flags) :
 
     _shared_memory = new ProcessSharedBuffer(this);
     _shared_memory->connectToBuffer(QString("%1-%2").arg(QCoreApplication::applicationName(),QDir::homePath()));
+    connect(_shared_memory,SIGNAL(dataAvailable()),this,SLOT(parsingParameters()));
 
     _pidstr = QString("PID_%1").arg(QDir::homePath());
     _pingstr = QString("LastPing_%1").arg(QDir::homePath());
+    _argstr = QString("ARG_%1").arg(QDir::homePath());
 }
 
 MyApplication::~MyApplication()
@@ -57,16 +59,16 @@ bool MyApplication::isFirstProcess()
             else
             {
                 _shared_memory->clearData();
-                _shared_memory->writeToBuffer(_pidstr,cur_pid);
-                _shared_memory->writeToBuffer(_pingstr,QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+                _shared_memory->writeToBuffer(_pidstr,cur_pid,true);
+                _shared_memory->writeToBuffer(_pingstr,QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"),true);
                 _first_proc = true;
                 return true;
             }
         }
         else
         {
-            _shared_memory->writeToBuffer(_pidstr,cur_pid);
-            _shared_memory->writeToBuffer(_pingstr,QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+            _shared_memory->writeToBuffer(_pidstr,cur_pid,true);
+            _shared_memory->writeToBuffer(_pingstr,QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"),true);
             _first_proc = true;
             return true;
         }
@@ -75,11 +77,31 @@ bool MyApplication::isFirstProcess()
     return false;
 }
 
+void MyApplication::parsingParameters()
+{
+    if(!_first_proc)
+    {
+        QString out;
+        foreach (QString curstr, arguments()) {
+            out += curstr + "\r\n";
+        }
+        _shared_memory->writeToBuffer(_argstr,out);
+    }
+    else
+    {
+        QStringList params;
+        if(qobject_cast<ProcessSharedBuffer*>(sender()) == _shared_memory)
+            params = _shared_memory->getData().value(_argstr).toString().split("\r\n");
+        else params = arguments();
+        qDebug()<<params;
+    }
+}
+
 void MyApplication::scheduler()
 {
     if(_one_proc && _first_proc)
     {
-        _shared_memory->writeToBuffer(_pingstr,QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+        _shared_memory->writeToBuffer(_pingstr,QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"),true);
         QTimer::singleShot(_one_proc_timeout, this, SLOT(scheduler()));
     }
 }

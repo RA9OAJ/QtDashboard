@@ -21,8 +21,9 @@ public:
 signals:
 
 public slots:
-    void scheduler();
+    void parsingParameters();
 protected slots:
+    void scheduler();
 
 private:
     bool _one_proc;
@@ -30,7 +31,7 @@ private:
     int _one_proc_timeout;
 
     ProcessSharedBuffer *_shared_memory;
-    QString _pidstr, _pingstr;
+    QString _pidstr, _pingstr, _argstr;
 };
 
 #endif // MYAPPLICATION_H

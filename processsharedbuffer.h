@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QMetaType>
 #include <QDataStream>
+#include <QDebug>
 
 class ProcessSharedBuffer : public QObject
 {
@@ -20,8 +21,8 @@ public:
 
     bool connectToBuffer(const QString &buffer_name, int buf_size = 4096);
     bool disconnectFromBuffer();
-    QMap<QString,QVariant> getData();
-    bool writeToBuffer(const QString &key, const QVariant &val);
+    QMap<QString,QVariant> getData(bool sysflag = false);
+    bool writeToBuffer(const QString &key, const QVariant &val, bool sysflag = false);
     bool deleteData(const QString &key);
     bool clearData();
 
@@ -38,7 +39,9 @@ public slots:
 
 protected slots:
     void scheduler();
-    bool writeData(const QMap<QString,QVariant> &data);
+
+protected:
+    bool writeData(const QMap<QString,QVariant> &data, bool sysflag = false);
 
 private:
     bool _enable_flag;

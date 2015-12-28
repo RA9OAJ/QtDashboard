@@ -54,15 +54,12 @@ bool ProcessSharedBuffer::disconnectFromBuffer()
     return false;
 }
 
-QMap<QString, QVariant> ProcessSharedBuffer::getData()
+QMap<QString, QVariant> ProcessSharedBuffer::getData(bool sysflag)
 {
     QMap<QString, QVariant> inmap;
 
     if(_buffer && _buffer->isAttached())
     {
-        if(!_buffer->lock())
-            return inmap;
-
         QByteArray inbuf;
         inbuf.resize(_buffer->size());
         memcpy(inbuf.data(),_buffer->data(),_buffer->size());
@@ -71,6 +68,7 @@ QMap<QString, QVariant> ProcessSharedBuffer::getData()
 
         int count;
         in >> count;
+        if(!sysflag) _last_upd = count;
         in >> count;
 
         for(int i = 0; i < count; ++i)
@@ -143,21 +141,23 @@ QMap<QString, QVariant> ProcessSharedBuffer::getData()
             }
         }
 
-        _buffer->unlock();
         return inmap;
     }
     return inmap;
 }
 
-bool ProcessSharedBuffer::writeToBuffer(const QString &key, const QVariant &val)
+bool ProcessSharedBuffer::writeToBuffer(const QString &key, const QVariant &val, bool sysflag)
 {
     if(_buffer && _buffer->isAttached())
     {
+        _buffer->lock();
         QMap<QString,QVariant> data;
-        data = getData();
+        data = getData(sysflag);
         data.insert(key,val);
 
-        return writeData(data);
+        bool result = writeData(data,sysflag);
+        _buffer->unlock();
+        return result;
     }
     return false;
 }
@@ -224,36 +224,36 @@ void ProcessSharedBuffer::scheduler()
         QTimer::singleShot(500,this,SLOT(scheduler()));
 }
 
-bool ProcessSharedBuffer::writeData(const QMap<QString,QVariant> &data)
+bool ProcessSharedBuffer::writeData(const QMap<QString,QVariant> &data, bool sysflag)
 {
     if(_buffer && _buffer->isAttached())
     {
-        clearData();
-
         bool need_emit = false;
-
-        if(!_buffer->lock())
-            return false;
 
         QByteArray outbuf;
         outbuf.resize(_buffer->size());
         memcpy(outbuf.data(),_buffer->data(),_buffer->size());
+        memset(outbuf.data()+sizeof(int)*2,0x0,_buffer->size()-sizeof(int)*2);
 
         QDataStream out(&outbuf,QIODevice::ReadWrite);
         int buf_cnt = 0;
 
         out >> buf_cnt;
         out.device()->seek(0);
+
         if(buf_cnt > _last_upd)
         {
             need_emit = true;
             _last_upd = buf_cnt;
         }
 
-        if(_last_upd == std::numeric_limits<int>::max())
-            _last_upd = 1;
-        else
-            ++_last_upd;
+        if(!sysflag)
+        {
+            if(_last_upd == std::numeric_limits<int>::max())
+                _last_upd = 1;
+            else
+                ++_last_upd;
+        }
 
         out << _last_upd << data.size();
 
@@ -295,9 +295,7 @@ bool ProcessSharedBuffer::writeData(const QMap<QString,QVariant> &data)
                 break;
             }
         }
-
         memcpy(_buffer->data(),outbuf.data(),outbuf.size());
-        _buffer->unlock();
 
         if(need_emit)
             emit dataAvailable();
@@ -312,7 +310,7 @@ void ProcessSharedBuffer::scanBuffer()
     {
         _buffer->lock();
         QByteArray buf;
-        buf.resize(8);
+        buf.resize(32);
         memcpy(buf.data(),_buffer->data(),buf.size());
 
         QDataStream in(&buf,QIODevice::ReadOnly);

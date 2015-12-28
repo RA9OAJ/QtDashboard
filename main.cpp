@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
 
     if(!app.isFirstProcess())
     {
+        app.parsingParameters();
         qDebug()<<"It's not first process! Exit now.";
         return 0;
     }
