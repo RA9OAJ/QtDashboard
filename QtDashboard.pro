@@ -4,7 +4,8 @@ QT += qml quick widgets sql av
 
 SOURCES += main.cpp \
     sourcemanager.cpp \
-    processsharedbuffer.cpp
+    processsharedbuffer.cpp \
+    myapplication.cpp
 
 RESOURCES += qml.qrc
 
@@ -27,4 +28,5 @@ include(deployment.pri)
 HEADERS += \
     sourcemanager.h \
     Section.h \
-    processsharedbuffer.h
+    processsharedbuffer.h \
+    myapplication.h

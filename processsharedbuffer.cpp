@@ -11,7 +11,11 @@ ProcessSharedBuffer::ProcessSharedBuffer(QObject *parent) :
 ProcessSharedBuffer::~ProcessSharedBuffer()
 {
     if(_buffer)
+    {
+        if(_buffer->isAttached())
+            _buffer->detach();
         _buffer->deleteLater();
+    }
 }
 
 bool ProcessSharedBuffer::connectToBuffer(const QString &buffer_name, int buf_size)
