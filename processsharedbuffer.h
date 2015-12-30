@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QMap>
 #include <QVariant>
+#include <QThread>
 #include <QByteArray>
 #include <QDateTime>
 #include <QMetaType>
@@ -25,6 +26,8 @@ public:
     bool writeToBuffer(const QString &key, const QVariant &val, bool sysflag = false);
     bool deleteData(const QString &key);
     bool clearData();
+    bool lock(unsigned int msec = 100);
+    bool unlock(unsigned int msec = 100);
 
     bool isConnected() const;
     QSharedMemory::SharedMemoryError error() const;
@@ -45,6 +48,7 @@ protected:
 
 private:
     bool _enable_flag;
+    bool _lock_flag;
     int _last_upd;
     QSharedMemory *_buffer;
 };

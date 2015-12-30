@@ -6,6 +6,7 @@ ProcessSharedBuffer::ProcessSharedBuffer(QObject *parent) :
     _buffer = 0;
     _last_upd = 0;
     _enable_flag = false;
+    _lock_flag = false;
 }
 
 ProcessSharedBuffer::~ProcessSharedBuffer()
@@ -60,6 +61,9 @@ QMap<QString, QVariant> ProcessSharedBuffer::getData(bool sysflag)
 
     if(_buffer && _buffer->isAttached())
     {
+        if(!lock())
+            return inmap;
+
         QByteArray inbuf;
         inbuf.resize(_buffer->size());
         memcpy(inbuf.data(),_buffer->data(),_buffer->size());
@@ -140,7 +144,7 @@ QMap<QString, QVariant> ProcessSharedBuffer::getData(bool sysflag)
                 continue;
             }
         }
-
+        unlock();
         return inmap;
     }
     return inmap;
@@ -150,13 +154,15 @@ bool ProcessSharedBuffer::writeToBuffer(const QString &key, const QVariant &val,
 {
     if(_buffer && _buffer->isAttached())
     {
-        _buffer->lock();
+        if(!lock())
+            return false;
+
         QMap<QString,QVariant> data;
         data = getData(sysflag);
         data.insert(key,val);
 
         bool result = writeData(data,sysflag);
-        _buffer->unlock();
+        unlock();
         return result;
     }
     return false;
@@ -179,12 +185,56 @@ bool ProcessSharedBuffer::clearData()
 {
     if(_buffer && _buffer->isAttached())
     {
-        if(!_buffer->lock())
+        if(!lock())
             return false;
 
         memset(_buffer->data(),0x0,_buffer->size());
 
-        _buffer->unlock();
+        unlock();
+    }
+    return false;
+}
+
+bool ProcessSharedBuffer::lock(unsigned int msec)
+{
+    if(_buffer && _buffer->isAttached())
+    {
+        if(_lock_flag)
+            return true;
+
+        for(int i = 0; i < qMax<int>((int)msec/5,1); ++i)
+        {
+            _lock_flag = _buffer->lock();
+
+            if(_lock_flag)
+                break;
+
+            thread()->usleep(5000);
+        }
+
+        return _lock_flag;
+    }
+    return false;
+}
+
+bool ProcessSharedBuffer::unlock(unsigned int msec)
+{
+    if(_buffer && _buffer->isAttached())
+    {
+        if(!_lock_flag)
+            return true;
+
+        for(int i = 0; i < qMax<int>((int)msec/5,1); ++i)
+        {
+            _lock_flag = !_buffer->unlock();
+
+            if(!_lock_flag)
+                break;
+
+            thread()->usleep(5000);
+        }
+
+        return !_lock_flag;
     }
     return false;
 }
@@ -228,6 +278,8 @@ bool ProcessSharedBuffer::writeData(const QMap<QString,QVariant> &data, bool sys
 {
     if(_buffer && _buffer->isAttached())
     {
+        if(!lock())
+            return false;
         bool need_emit = false;
 
         QByteArray outbuf;
@@ -299,6 +351,8 @@ bool ProcessSharedBuffer::writeData(const QMap<QString,QVariant> &data, bool sys
 
         if(need_emit)
             emit dataAvailable();
+
+        unlock();
         return true;
     }
     return false;
@@ -308,7 +362,9 @@ void ProcessSharedBuffer::scanBuffer()
 {
     if(_buffer && _buffer->isAttached())
     {
-        _buffer->lock();
+        if(!lock())
+            return;
+
         QByteArray buf;
         buf.resize(32);
         memcpy(buf.data(),_buffer->data(),buf.size());
@@ -316,7 +372,7 @@ void ProcessSharedBuffer::scanBuffer()
         QDataStream in(&buf,QIODevice::ReadOnly);
         int new_cnt = 0;
         in >> new_cnt;
-        _buffer->unlock();
+        unlock();
 
         if(new_cnt != _last_upd)
             emit dataAvailable();

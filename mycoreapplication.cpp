@@ -1,7 +1,7 @@
-#include "myapplication.h"
+#include "mycoreapplication.h"
 
-MyApplication::MyApplication(int &argc, char **argv, int flags) :
-        QApplication(argc, argv, flags)
+MyCoreApplication::MyCoreApplication(int &argc, char **argv, int flags)
+    : QCoreApplication(argc,argv, flags)
 {
     _one_proc = false;
     _one_proc_timeout = 2500;
@@ -16,14 +16,14 @@ MyApplication::MyApplication(int &argc, char **argv, int flags) :
     _argstr = QString("ARG_%1").arg(QDir::homePath());
 }
 
-MyApplication::~MyApplication()
+MyCoreApplication::~MyCoreApplication()
 {
     if(_shared_memory->isConnected())
         _shared_memory->disconnectFromBuffer();
     _shared_memory->deleteLater();
 }
 
-void MyApplication::setOnlyOneProcess(bool flag, int timeout_sec)
+void MyCoreApplication::setOnlyOneProcess(bool flag, int timeout_sec)
 {
     _one_proc = flag;
     _one_proc_timeout = timeout_sec * 1000 / 4;
@@ -39,7 +39,7 @@ void MyApplication::setOnlyOneProcess(bool flag, int timeout_sec)
         _first_proc = true;
 }
 
-bool MyApplication::isFirstProcess()
+bool MyCoreApplication::isFirstProcess()
 {
     if(_one_proc && !_first_proc)
         return _first_proc;
@@ -77,7 +77,7 @@ bool MyApplication::isFirstProcess()
     return false;
 }
 
-void MyApplication::parsingParameters()
+void MyCoreApplication::parsingParameters()
 {
     if(!_first_proc)
     {
@@ -96,7 +96,7 @@ void MyApplication::parsingParameters()
     }
 }
 
-void MyApplication::scheduler()
+void MyCoreApplication::scheduler()
 {
     if(_one_proc && _first_proc)
     {
