@@ -79,10 +79,12 @@ bool MyApplication::isFirstProcess()
 
 void MyApplication::parsingParameters()
 {
-    if(!_first_proc)
+    if(!_first_proc && arguments().size() > 1)
     {
         QString out;
         foreach (QString curstr, arguments()) {
+            if(curstr == arguments().value(0))
+                continue;
             out += curstr + "\r\n";
         }
         _shared_memory->writeToBuffer(_argstr,out);
@@ -91,8 +93,31 @@ void MyApplication::parsingParameters()
     {
         QStringList params;
         if(qobject_cast<ProcessSharedBuffer*>(sender()) == _shared_memory)
-            params = _shared_memory->getData().value(_argstr).toString().split("\r\n");
+            params = _shared_memory->getData().value(_argstr).toString().split("\r\n",QString::SkipEmptyParts);
         else params = arguments();
+
+        if(isValidParams(params))
+        {
+            foreach (QString cur, params) {
+                if(cur == "--show-cursor")
+                    qApp->setOverrideCursor(Qt::ArrowCursor);
+                else if(cur == "--hide-cursor")
+                    qApp->setOverrideCursor(Qt::BlankCursor);
+                else if(cur == "--quit")
+                    QTimer::singleShot(0,qApp,SLOT(quit()));
+                else if(cur == "--restart")
+                {
+                    QProcess proc;
+                    _shared_memory->clearData();
+                    proc.startDetached(arguments().value(0));
+                    qApp->quit();
+                }
+                else if(cur == "--reload")
+                {
+                    qDebug()<<"Reload!";
+                }
+            }
+        }
     }
 }
 
@@ -103,5 +128,24 @@ void MyApplication::scheduler()
         _shared_memory->writeToBuffer(_pingstr,QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"),true);
         QTimer::singleShot(_one_proc_timeout, this, SLOT(scheduler()));
     }
+}
+
+bool MyApplication::isValidParams(const QStringList &args) const
+{
+    //QString last_arg;
+    QString cur;
+
+    for(int i = 1; i < args.size(); i++) {
+        cur = args.value(i);
+        if(cur == "--show-cursor"
+                || cur == "--hide-cursor"
+                || cur == "--reload"
+                || cur == "--restart"
+                || cur == "--quit")
+            return true;
+        else return false;
+    }
+
+    return false;
 }
 

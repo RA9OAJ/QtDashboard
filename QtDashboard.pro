@@ -1,6 +1,7 @@
 TEMPLATE = app
 
 QT += qml quick widgets sql av
+QMAKE_EXTRA_TARGETS += mytemplate
 
 SOURCES += main.cpp \
     sourcemanager.cpp \
@@ -32,3 +33,9 @@ HEADERS += \
     processsharedbuffer.h \
     myapplication.h \
     mycoreapplication.h
+
+#Default template
+mytemplate.target = DefaultTemplate
+mytemplate.commands = mkdir -p $$DESTDIR/../share/QtDashboard/templates/DefaultTemplate; cp $$PWD/qml/main.qml $$DESTDIR/../share/QtDashboard/templates/DefaultTemplate/main.qml
+
+POST_TARGETDEPS += DefaultTemplate

@@ -2,6 +2,7 @@
 #define MYAPPLICATION_H
 
 #include <QApplication>
+#include <QProcess>
 #include <QDir>
 #include <QTimer>
 #include <QDebug>
@@ -24,6 +25,9 @@ public slots:
     void parsingParameters();
 protected slots:
     void scheduler();
+
+protected:
+    virtual bool isValidParams(const QStringList &args) const;
 
 private:
     bool _one_proc;
