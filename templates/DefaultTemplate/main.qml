@@ -96,6 +96,33 @@ ApplicationWindow {
             anchors.leftMargin: 10
             anchors.left: main_frame.right
             //color: "#99FFFFFF"
+
+            Column {
+                spacing: 5
+                x: 1
+                y: 7
+                width: parent.width - 2
+                height: parent.height - y
+
+                Text{text: "Руководитель УФК по Новосибирской области"; wrapMode: Text.WordWrap; horizontalAlignment: Text.Center; width: parent.width; font.pixelSize: 16}
+
+                Image {
+                    id: ruk
+                    x: (parent.width - width) / 2
+                    width: parent.width * 0.47
+
+                    fillMode: Image.PreserveAspectFit
+                    source: "images/ruk.jpg"
+                }
+
+                Text{text: "<b><i>Гаврилюк Валерий Геннадьевич</i></b>"; wrapMode: Text.WordWrap; horizontalAlignment: Text.Center; width: parent.width; font.pixelSize: 16;}
+                Text{text: "<i>тел. +7 (383) 269-51-05</i>"; wrapMode: Text.WordWrap; horizontalAlignment: Text.Center; width: parent.width; font.pixelSize: 14;}
+                Text{text: "<br/><b>График личного приема граждан руководителем и заместителями руководителя</b>"; wrapMode: Text.WordWrap; horizontalAlignment: Text.Center; width: parent.width - 10; font.pixelSize: 13; x: 5}
+                Text{text: "<ul><li>Вт.-Чт. с 14-00 до 16-00</li></ul>
+                            Запись на прием по телефонам: <ul><li><i>+7 (383) 269-60-91</i></li><li><i>+7 (383) 218-08-07</i></li><li><i>+7 (383) 269-61-05</i></li></ul>"; wrapMode: Text.WordWrap; width: parent.width; font.pixelSize: 13; x: 6}
+
+            }
+
         }
 
         Rectangle {
