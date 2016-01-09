@@ -1,13 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="main.qml">qml/main.qml</file>
         <file alias="MediaWidget.qml">qml/MediaWidget.qml</file>
         <file alias="WebWidget.qml">qml/WebWidget.qml</file>
-        <file alias="kazna.jpg">images/kazna.jpg</file>
-        <file alias="rain.jpg">images/rain.jpg</file>
-        <file alias="snow.jpg">images/snow.jpg</file>
-        <file alias="snow1.jpg">images/snow1.jpg</file>
-        <file alias="cloud.jpg">images/cloud.jpg</file>
         <file alias="WeatherWidget.qml">qml/WeatherWidget.qml</file>
         <file alias="DateTimeWidget.qml">qml/DateTimeWidget.qml</file>
         <file alias="WidgetManager.qml">qml/WidgetManager.qml</file>

@@ -7,7 +7,9 @@ SOURCES += main.cpp \
     sourcemanager.cpp \
     processsharedbuffer.cpp \
     myapplication.cpp \
-    mycoreapplication.cpp
+    mycoreapplication.cpp \
+
+OTHER_FILES += templates/DefaultTemplate/main.qml
 
 RESOURCES += qml.qrc
 
@@ -24,9 +26,6 @@ RCC_DIR        = build/res
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
-# Default rules for deployment.
-include(deployment.pri)
-
 HEADERS += \
     sourcemanager.h \
     Section.h \
@@ -36,6 +35,6 @@ HEADERS += \
 
 #Default template
 mytemplate.target = DefaultTemplate
-mytemplate.commands = mkdir -p $$DESTDIR/../share/QtDashboard/templates/DefaultTemplate; cp $$PWD/qml/main.qml $$DESTDIR/../share/QtDashboard/templates/DefaultTemplate/main.qml
+mytemplate.commands = mkdir -p $$DESTDIR/../share/QtDashboard/templates; cp -R $$PWD/templates/ $$DESTDIR/../share/QtDashboard/
 
 POST_TARGETDEPS += DefaultTemplate

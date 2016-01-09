@@ -18,7 +18,7 @@ ApplicationWindow {
     Image {
         width: parent.width
         height: parent.height
-        source: "./back.jpg"
+        source: "./images/back.jpg"
 
         Rectangle {
             x: 10
@@ -116,6 +116,13 @@ ApplicationWindow {
             anchors.left: main_frame.right
             anchors.top: right_frame1.bottom
             //color: "#99FFFFFF"
+
+            Calendar {
+                x: 1
+                y: 1
+                width: parent.width - 2
+                height: parent.height - 2
+            }
         }
     }
 
