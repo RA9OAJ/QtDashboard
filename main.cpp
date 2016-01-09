@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<SourceManager>("SourceManager",1,0,"SourceManager");
 
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
+    engine.load(QUrl(QString("%1/../share/QtDashboard/templates/DefaultTemplate/main.qml").arg(qApp->applicationDirPath())));
 
     return app->exec();
 }

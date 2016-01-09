@@ -12,13 +12,13 @@ ApplicationWindow {
     visibility: "FullScreen"
     color: "#CCCCCC"
 
-    property var widget_manager: Null
+    property var widget_manager: null
     property bool flag: false
 
     Image {
         width: parent.width
         height: parent.height
-        source: "qrc:///kazna.jpg"
+        source: "./back.jpg"
 
         Rectangle {
             x: 10
