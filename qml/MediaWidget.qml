@@ -8,6 +8,7 @@ Rectangle {
     anchors.centerIn: parent
 
     readonly property string widget_type: "VIDEO"
+    property int src_id: -1
     property alias source: player.source
     property bool _paused: true
     property alias muted: player.muted
@@ -25,6 +26,7 @@ Rectangle {
 
         muted: false
         autoPlay: false
+        volume: 1.0
 
         onPaused: {
             _paused = true
@@ -42,8 +44,9 @@ Rectangle {
         }
 
         onError: {
-            __error(error, errorString)
+            __error(src_id, errorString)
         }
+
     }
 
     VideoOutput2 {
@@ -66,6 +69,7 @@ Rectangle {
                     else player.pause()
                 }
                 else player.stop()
+                player.volume = 1.0
             }
     }
 

@@ -113,8 +113,8 @@ signals:
 public slots:
     void goNext();
     void goPrev();
-    void sourceLoaded();
-    void sourceError();
+    void sourceLoaded(int id);
+    void sourceError(int id);
     void readXmlSourceList(const QString &name);
 
 private:

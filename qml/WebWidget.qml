@@ -12,6 +12,7 @@ Item {
     anchors.centerIn: parent
 
     readonly property string widget_type: "WEB"
+    property int src_id: -1
     property bool _paused: true
     property bool muted: true
     property real volume: 0.0

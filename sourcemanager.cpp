@@ -148,16 +148,16 @@ void SourceManager::goPrev()
     }
 }
 
-void SourceManager::sourceLoaded()
+void SourceManager::sourceLoaded(int id)
 {
-    if(blacklist.contains(_cur_id))
-        blacklist.removeOne(_cur_id);
+    if(blacklist.contains(id))
+        blacklist.removeOne(id);
 }
 
-void SourceManager::sourceError()
+void SourceManager::sourceError(int id)
 {
-    if(!blacklist.contains(_cur_id))
-        blacklist.append(_cur_id);
+    if(!blacklist.contains(id))
+        blacklist.append(id);
 }
 
 void SourceManager::readXmlSourceList(const QString &name)

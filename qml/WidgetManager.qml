@@ -15,12 +15,52 @@ Item {
         property  variant busyWidgets: []
         property variant freeWidgets: []
 
-        function isLoaded() {
-            console.log("Next is Load!")
+        function isLoaded(src_id) {
+            console.log("Next slide is Load!")
         }
 
-        function isError() {
-            console.log("Mext not Load :(")
+        function isError(src_id,err_text) {
+            src_id = typeof src_id != "undefined" ? src_id : -1
+            err_text = typeof err_text != "undefined" ? err_text : "Undefined error"
+
+            console.log("Next slide not Load. Error: " + err_text)
+
+            srcmanager.sourceError(src_id)
+
+            var num = internal.busyWidgets.length
+            var cur_item = -1
+
+            for(var i = 0; i < num; i++)
+                if(internal.busyWidgets[i].src_id === src_id)
+                    cur_item = i
+
+            if(cur_item === -1)
+                return
+
+            if(!cur_item) {
+                if(num > 1)
+                    parent.next()
+
+                else {
+                    delete internal.busyWidgets[0]
+                    internal.busyWidgets.splice(0,1)
+
+                    if(srcmanager.current === src_id)
+                        srcmanager.goNext()
+
+                    var cur = srcmanager.current
+                    parent.createObject()
+
+                    if(srcmanager.current === cur)
+                        srcmanager.goPrev()
+                }
+            }
+            else {
+                delete internal.busyWidgets[cur_item]
+                internal.busyWidgets.splice(cur_item,1)
+                srcmanager.goNext()
+                createObject()
+            }
         }
 
         function getFreeWidget(widget_type) {
@@ -80,36 +120,40 @@ Item {
                 console.log(component.errorString)
 
             if(childRec != null) {
-                var array = new Array
+                /*var array = new Array
                 if(internal.busyWidgets.length != 0)
-                    array = internal.busyWidgets
-                var num = array.length
-                array[num] = childRec;
+                    array = internal.busyWidgets*/
+                var num = internal.busyWidgets.length
+                internal.busyWidgets[num] = childRec;
 
                 if(num == 0) {
-                    array[0].volume = srcmanager.volume
-                    array[0].muted = srcmanager.mute
-                    array[0].timeout = srcmanager.timer * 1000
-                    array[0].ended.connect(ended)
-                    array[0].loaded.connect(loaded)
-                    array[0].started.connect(started)
-                    array[0].setSource(srcmanager.source)
+                    console.log("Vol: " + srcmanager.volume + " " + srcmanager.mute )
+                    internal.busyWidgets[0].src_id = srcmanager.current
+                    internal.busyWidgets[0].volume = srcmanager.volume
+                    internal.busyWidgets[0].muted = srcmanager.mute
+                    internal.busyWidgets[0].timeout = srcmanager.timer * 1000
+                    internal.busyWidgets[0].ended.connect(ended)
+                    internal.busyWidgets[0].loaded.connect(loaded)
+                    internal.busyWidgets[0].started.connect(started)
+                    internal.busyWidgets[0].__error.connect(internal.isError)
+                    internal.busyWidgets[0].setSource(srcmanager.source)
                     srcmanager.goNext()
                 }
                 else {
-                    array[num].visible = false
-                    array[num].volume = srcmanager.volume
-                    array[num].muted = srcmanager.mute
-                    array[num].timeout = srcmanager.timer * 1000
-                    array[num].ended.disconnect(ended)
-                    array[num].loaded.disconnect(loaded)
-                    array[num].started.disconnect(started)
-                    array[num].loaded.connect(internal.isLoaded)
-                    array[num].__error.connect(internal.isError)
-                    array[num].setSource(srcmanager.source)
+                    internal.busyWidgets[num].visible = false
+                    internal.busyWidgets[num].src_id = srcmanager.current
+                    internal.busyWidgets[num].volume = srcmanager.volume
+                    internal.busyWidgets[num].muted = srcmanager.mute
+                    internal.busyWidgets[num].timeout = srcmanager.timer * 1000
+                    internal.busyWidgets[num].ended.disconnect(ended)
+                    internal.busyWidgets[num].loaded.disconnect(loaded)
+                    internal.busyWidgets[num].started.disconnect(started)
+                    internal.busyWidgets[num].loaded.connect(internal.isLoaded)
+                    internal.busyWidgets[num].__error.connect(internal.isError)
+                    internal.busyWidgets[num].setSource(srcmanager.source)
                 }
 
-                internal.busyWidgets = array
+                //internal.busyWidgets = array
             }
         }
     }
@@ -135,32 +179,34 @@ Item {
 
     function next() {
         if(internal.busyWidgets.length) {
-            var array = new Array
+            /*var array = new Array
             var free_windgets = new Array
             array = internal.busyWidgets
-            free_windgets = internal.freeWidgets
+            free_windgets = internal.freeWidgets*/
 
-            if(array.length > 0) {
-                array[0].visible = false
-                array[0].ended.disconnect(ended)
-                array[0].loaded.disconnect(loaded)
-                array[0].started.disconnect(started)
-                array[0].stop()
-                free_windgets.push(array.shift())
-                internal.freeWidgets = free_windgets
+            if(internal.busyWidgets.length > 0) {
+                internal.busyWidgets[0].visible = false
+                internal.busyWidgets[0].src_id = -1
+                internal.busyWidgets[0].ended.disconnect(ended)
+                internal.busyWidgets[0].loaded.disconnect(loaded)
+                internal.busyWidgets[0].started.disconnect(started)
+                internal.busyWidgets[0].__error.disconnect(internal.isError)
+                internal.busyWidgets[0].stop()
+                internal.freeWidgets.push(internal.busyWidgets.shift())
+                //internal.freeWidgets = free_windgets
             }
 
-            if(array.length > 0) {
-                array[0].ended.connect(ended)
-                array[0].loaded.connect(loaded)
-                array[0].started.connect(started)
-                array[0].__error.disconnect(internal.isError)
-                array[0].loaded.disconnect(internal.isLoaded)
-                array[0].visible = true
+            if(internal.busyWidgets.length > 0) {
+                internal.busyWidgets[0].ended.connect(ended)
+                internal.busyWidgets[0].loaded.connect(loaded)
+                internal.busyWidgets[0].started.connect(started)
+                internal.busyWidgets[0].__error.disconnect(internal.isError)
+                internal.busyWidgets[0].loaded.disconnect(internal.isLoaded)
+                internal.busyWidgets[0].visible = true
                 srcmanager.goNext()
                 loaded()
             }
-            internal.busyWidgets = array
+            //internal.busyWidgets = array
         }
     }
 

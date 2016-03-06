@@ -41,7 +41,7 @@ ApplicationWindow {
             //color: "#009900FF"
 
             Component.onCompleted: {
-                var component = Qt.createComponent("WidgetManager.qml");
+                var component = Qt.createComponent("qrc:/WidgetManager.qml");
                 main.title = component.errorString()
                 if (component.status === Component.Ready) {
                     var childRec = component.createObject(frame);

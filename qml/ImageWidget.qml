@@ -7,6 +7,7 @@ Item {
     anchors.centerIn: parent
 
     readonly property string widget_type: "IMAGE"
+    property int src_id: -1
     property bool _paused: true
     property bool muted: true
     property real volume: 0.0
@@ -27,6 +28,8 @@ Item {
         onStatusChanged: {
             if(img.status == Image.Ready)
                 loaded()
+            else if(img.status == Image.Error)
+                __error(src_id,qsTr("Cannot open file '"+source+"'"))
         }
     }
 
