@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QProcess>
 #include <QHostAddress>
+#include <QCoreApplication>
+#include <QDir>
+#include <QTcpServer>
 #include <QSslSocket>
 #include <QSettings>
 
@@ -11,8 +14,9 @@
 
 class TcpService : public QTcpServer
 {
+    Q_OBJECT
 public:
-    TcpService();
+    explicit TcpService(QObject *parent = 0);
     ~TcpService();
 
 public slots:
