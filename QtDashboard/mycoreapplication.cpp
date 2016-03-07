@@ -39,6 +39,19 @@ void MyCoreApplication::setOnlyOneProcess(bool flag, int timeout_sec)
         _first_proc = true;
 }
 
+void MyCoreApplication::setSharedValue(const QString &name, const QVariant &val, bool sysflag)
+{
+    if(_shared_memory && _shared_memory->isConnected())
+        _shared_memory->writeToBuffer(name,val,sysflag);
+}
+
+QMap<QString, QVariant> MyCoreApplication::getSharedValue(bool sysflag) const
+{
+    if(_shared_memory && _shared_memory->isConnected())
+        return _shared_memory->getData(sysflag);
+    else  return QMap<QString, QVariant>();
+}
+
 bool MyCoreApplication::isFirstProcess()
 {
     if(_one_proc && !_first_proc)

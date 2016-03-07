@@ -15,6 +15,8 @@ public:
     ~MyCoreApplication();
 
     void setOnlyOneProcess(bool flag, int timeout_sec = 5);
+    void setSharedValue(const QString &name, const QVariant &val, bool sysflag = false);
+    QMap<QString,QVariant> getSharedValue(bool sysflag = false) const;
     bool isFirstProcess();
 
 signals:

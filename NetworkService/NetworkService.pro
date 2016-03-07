@@ -15,5 +15,12 @@ UI_HEADERS_DIR = build/ui/h
 UI_SOURCES_DIR = build/ui/cpp
 RCC_DIR        = build/res
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+            ../QtDashboard/mycoreapplication.cpp \
+            ../QtDashboard/processsharedbuffer.cpp \
+    tcpservice.cpp
+
+HEADERS += ../QtDashboard/mycoreapplication.h \
+                ../QtDashboard/processsharedbuffer.h \
+    tcpservice.h
 
