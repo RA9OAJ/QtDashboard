@@ -18,9 +18,13 @@ RCC_DIR        = build/res
 SOURCES += main.cpp \
             ../QtDashboard/mycoreapplication.cpp \
             ../QtDashboard/processsharedbuffer.cpp \
-    tcpservice.cpp
+    tcpservice.cpp \
+    servicecore.cpp \
+    servicelog.cpp
 
 HEADERS += ../QtDashboard/mycoreapplication.h \
                 ../QtDashboard/processsharedbuffer.h \
-    tcpservice.h
+    tcpservice.h \
+    servicecore.h \
+    servicelog.h
 

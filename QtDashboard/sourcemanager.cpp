@@ -127,6 +127,8 @@ void SourceManager::goNext()
 
         if(!blacklist.contains(i))
         {
+
+
             setCurrent(i);
             break;
         }

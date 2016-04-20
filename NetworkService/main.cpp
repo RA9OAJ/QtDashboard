@@ -2,6 +2,7 @@
 #include <QProcess>
 #include <iostream>
 #include "../QtDashboard/mycoreapplication.h"
+#include "servicelog.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,7 +11,11 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Sarvaritdinov Ravil <ra9oaj@gmail.com>");
 
     MyCoreApplication a(argc, argv);
-    a.setOnlyOneProcess(true,3);
+    ServiceLog log;
+
+    log.info("Я запустилсо!");
+
+    /*a.setOnlyOneProcess(true,3);
 
     if(a.isFirstProcess())
     {
@@ -38,8 +43,8 @@ int main(int argc, char *argv[])
     {
         //Service code
         QTimer::singleShot(5000,qApp,SLOT(quit()));
-    }
+    }*/
 
-    return a.exec();
+    return 0;//a.exec();
 }
 
