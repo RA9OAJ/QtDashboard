@@ -7,5 +7,6 @@
         <file alias="WidgetManager.qml">qml/WidgetManager.qml</file>
         <file alias="config.xml">config.xml</file>
         <file alias="ImageWidget.qml">qml/ImageWidget.qml</file>
+        <file alias="AImageWidget.qml">qml/AImageWidget.qml</file>
     </qresource>
 </RCC>

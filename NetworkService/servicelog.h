@@ -33,6 +33,7 @@ public:
     explicit ServiceLog(QObject *parent = 0);
 
     bool createLog(const QString &name, const QString &path = QString());
+    void setTitlePrefix(const QString &prefix);
 
 signals:
 
@@ -49,6 +50,7 @@ private:
     QMap<QString,QPair<QString,QString> > logs;
     QString appname;
     bool debug_mode;
+    QString _prefix;
 
 };
 

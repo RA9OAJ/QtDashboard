@@ -74,6 +74,11 @@ bool ServiceLog::createLog(const QString &name, const QString &path)
     return true;
 }
 
+void ServiceLog::setTitlePrefix(const QString &prefix)
+{
+    _prefix = prefix;
+}
+
 void ServiceLog::setDefaultLogFileName(const QString &name, const QString &filename)
 {
     if(!logs.contains(name))
@@ -101,7 +106,11 @@ void ServiceLog::log(const QString &title, const QString &text, const QString &l
         break;
     }
 
+    if(!_prefix.isEmpty())
+        message += _prefix + " ";
+
     message += title;
+
     if(!text.isEmpty())
         message += QString(": %1").arg(text);
 

@@ -3,7 +3,14 @@
 
 #include <QCoreApplication>
 #include <QTimer>
+#include <QUuid>
+#include <QStringList>
+#include <QProcess>
+#include <QRegExp>
+#include <QMap>
+
 #include "../QtDashboard/processsharedbuffer.h"
+#include "servicelog.h"
 
 
 class ServiceCore : public QCoreApplication
@@ -19,6 +26,7 @@ signals:
     void thisChildProcess();
 
 public slots:
+    void setDebugMode(bool enable = true);
 
 public:
     bool isParentProcess() const;
@@ -27,8 +35,16 @@ public:
 private slots:
     void scheduler();
 
+protected:
+    void createChildProcess();
+
 private:
     ProcessSharedBuffer _buffer;
+    ServiceLog *log;
+    QUuid uuid;
+    QUuid *parent_uuid;
+    bool scheduler_flag;
+    QMap<QString,QVariant> *smemdata;
 };
 
 #endif // SERVICECORE_H

@@ -102,7 +102,7 @@ Item {
             case SourceManager.IMAGE:
                 childRec = internal.getFreeWidget("IMAGE")
                 if(childRec == null)
-                    component = Qt.createComponent("ImageWidget.qml")
+                    component = Qt.createComponent("AImageWidget.qml")
                 break
             case SourceManager.AUDIO:
             case SourceManager.VIDEO:
