@@ -4,12 +4,13 @@ ServiceCore::ServiceCore(int &argc, char **argv) :
     QCoreApplication(argc,argv)
 {
     parent_uuid = 0;
+    child_created = false;
     scheduler_flag = false;
     uuid = QUuid::createUuid();
     log = new ServiceLog(this);
     log->setTitlePrefix(QString("%1 Pid=%2 ").arg(uuid.toString(),QString::number(applicationPid())));
 
-    QString buf_name = (qApp->applicationName().isEmpty() ? qApp->applicationDirPath() : qApp->applicationName());
+    QString buf_name = (qSce->applicationName().isEmpty() ? qSce->applicationDirPath() : qSce->applicationName());
     if(!_buffer.connectToBuffer(buf_name))
     {
         log->error(tr("Can't connect to shared buffer"),
@@ -53,12 +54,11 @@ ServiceCore::ServiceCore(int &argc, char **argv) :
 
         createChildProcess();
         emit thisParentProcess();
-        thread()->sleep(1);
     }
     else if(isChildProcess())
     {
         log->info(tr("This process is child."));
-        _buffer.writeToBuffer("__PID",applicationPid(),true);
+        //_buffer.writeToBuffer("__PID",applicationPid(),true);
         scheduler_flag = true;
         scheduler();
         emit thisChildProcess();
@@ -91,6 +91,18 @@ void ServiceCore::setDebugMode(bool enable)
     log->setDebugMode(enable);
 }
 
+void ServiceCore::childProcessStartSuccess()
+{
+    if(isChildProcess())
+        _buffer.writeToBuffer("__STARTED",applicationPid(),true);
+}
+
+void ServiceCore::childProcessStartFailure(int error)
+{
+    if(isChildProcess())
+        _buffer.writeToBuffer("__FAILURE",error,true);
+}
+
 bool ServiceCore::isParentProcess() const
 {
     if(!parent_uuid)
@@ -102,10 +114,15 @@ bool ServiceCore::isParentProcess() const
 bool ServiceCore::isChildProcess() const
 {
     if(smemdata && smemdata->contains("__PARENT_GUID") && parent_uuid)
-        if(smemdata->value("__PARENT_GUID").toString() == parent_uuid->toString())
+        if(smemdata->value("__PARENT_GUID").toString() == parent_uuid->toString() && smemdata->value("__PID").toLongLong() == qSce->applicationPid())
             return true;
 
     return false;
+}
+
+bool ServiceCore::childProcessCreated() const
+{
+    return child_created;
 }
 
 void ServiceCore::scheduler()
@@ -127,15 +144,38 @@ void ServiceCore::createChildProcess()
 
     qint64 child_pid = -1;
 
-    if(!QProcess::startDetached(qApp->applicationFilePath(), param, QString(), &child_pid))
+    if(!QProcess::startDetached(qSce->applicationFilePath(), param, QString(), &child_pid))
     {
         log->error(tr("Can't create a child process."));
         QTimer::singleShot(0,this,SLOT(quit()));
     }
     else
     {
+        child_created = true;
         _buffer.writeToBuffer("__PID",child_pid,true);
         log->info(tr("Child process created"),tr("Child process PID=%1").arg(QString::number(child_pid)));
+        emit childCreated(child_pid);
+        waitChildProcess(child_pid);
+    }
+}
+
+void ServiceCore::waitChildProcess(qint64 child_pid)
+{
+    while(_buffer.getData(true).value("__STARTED").toLongLong() != child_pid && !_buffer.getData(true).contains("__FAILURE"))
+        qSce->thread()->msleep(10);
+
+    QMap<QString,QVariant> smem = _buffer.getData(true);
+
+    if(smem.contains("__FAILURE"))
+    {
+        _buffer.deleteData("__FAILURE");
+        log->error(tr("Child process start FAILURE"),tr("Error code %1").arg(smem.value("__FAILURE").toString()));
+        emit childProcessFailure(smem.value("__FAILURE").toInt());
+    }
+    else
+    {
+        _buffer.deleteData("__STARTED");
+        emit childProcessSuccess();
     }
 }
 

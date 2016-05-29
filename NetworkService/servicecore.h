@@ -12,6 +12,7 @@
 #include "../QtDashboard/processsharedbuffer.h"
 #include "servicelog.h"
 
+#define qSce ((ServiceCore*)ServiceCore::instance())
 
 class ServiceCore : public QCoreApplication
 {
@@ -21,29 +22,36 @@ public:
     explicit ServiceCore(int & argc, char ** argv);
     ~ServiceCore();
 
+    bool isParentProcess() const;
+    bool isChildProcess() const;
+    bool childProcessCreated() const;
+
 signals:
     void thisParentProcess();
     void thisChildProcess();
+    void childCreated(qint64 pid);
+    void childProcessSuccess();
+    void childProcessFailure(int error);
 
 public slots:
     void setDebugMode(bool enable = true);
+    void childProcessStartSuccess();
+    void childProcessStartFailure(int error);
 
-public:
-    bool isParentProcess() const;
-    bool isChildProcess() const;
 
 private slots:
     void scheduler();
 
-protected:
-    void createChildProcess();
-
 private:
+    void createChildProcess();
+    void waitChildProcess(qint64 child_pid);
+
     ProcessSharedBuffer _buffer;
     ServiceLog *log;
     QUuid uuid;
     QUuid *parent_uuid;
     bool scheduler_flag;
+    bool child_created;
     QMap<QString,QVariant> *smemdata;
 };
 

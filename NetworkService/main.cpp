@@ -1,6 +1,5 @@
 #include <QCoreApplication>
 #include <QProcess>
-#include <iostream>
 
 #include "../QtDashboard/mycoreapplication.h"
 #include "servicecore.h"
@@ -15,10 +14,11 @@ int main(int argc, char *argv[])
     ServiceCore a(argc,argv);
     if(!a.isChildProcess())
     {
-        return 0;
+        return EXIT_SUCCESS;
     }
     else
     {
+        a.childProcessStartSuccess();
         QTimer::singleShot(600*1000,qApp,SLOT(quit()));
     }
 
