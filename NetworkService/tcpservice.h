@@ -8,8 +8,11 @@
 #include <QDir>
 #include <QTcpServer>
 #include <QSslSocket>
+#include <QHash>
 #include <QSettings>
+#include <QDebug>
 
+#include "servicecore.h"
 #include "../QtDashboard/processsharedbuffer.h"
 
 class TcpService : public QTcpServer
@@ -22,10 +25,12 @@ public:
 public slots:
     void parsingParameters();
 
+protected slots:
+    void readSettings();
+
 private:
-    QString litening_ip;
-    qint16 listening_port;
     ProcessSharedBuffer *_shared_buffer;
+    QHash<QString,QVariant> _settings;
 };
 
 #endif // TCPSERVICE_H

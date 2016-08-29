@@ -16,6 +16,7 @@ class ServiceLog : public QObject
 {
     Q_OBJECT
 
+public:
     enum LogType {
         FILE,
         UNIX,
@@ -29,7 +30,7 @@ class ServiceLog : public QObject
         ERROR
     };
 
-public:
+
     explicit ServiceLog(QObject *parent = 0);
 
     bool createLog(const QString &name, const QString &path = QString());

@@ -12,8 +12,9 @@ ServiceLog::ServiceLog(QObject *parent) : QObject(parent)
 #ifdef Q_OS_UNIX
     log_type = ServiceLog::UNIX;
     QPair<QString,QString> log_path;
-    if(QFile::exists("/var/log1"))
-        log_path.first = "/var/log";
+    QFileInfo flinfo(QString("/var/log/")+appname);
+    if(flinfo.exists() && flinfo.isWritable())
+        log_path.first = "/var/log/"+appname;
     else
     {
         log_path.first = QString("%1/.config/%2").arg(QDir::homePath(),appname);

@@ -34,10 +34,13 @@ signals:
     void childProcessFailure(int error);
 
 public slots:
+    void log(const QString &title, const QString &text = QString(), const QString &logname = "default", ServiceLog::EventType type = ServiceLog::INFO);
+    void error(const QString &title, const QString &text = QString(), const QString &logname = "default");
+    void warning(const QString &title, const QString &text = QString(), const QString &logname = "default");
+    void info(const QString &title, const QString &text = QString(), const QString &logname = "default");
     void setDebugMode(bool enable = true);
     void childProcessStartSuccess();
     void childProcessStartFailure(int error);
-
 
 private slots:
     void scheduler();
@@ -47,7 +50,7 @@ private:
     void waitChildProcess(qint64 child_pid);
 
     ProcessSharedBuffer _buffer;
-    ServiceLog *log;
+    ServiceLog *_log;
     QUuid uuid;
     QUuid *parent_uuid;
     bool scheduler_flag;

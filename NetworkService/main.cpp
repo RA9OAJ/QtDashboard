@@ -4,10 +4,11 @@
 #include "../QtDashboard/mycoreapplication.h"
 #include "servicecore.h"
 #include "servicelog.h"
+#include "tcpservice.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setApplicationName("QDNetService");
+    QCoreApplication::setApplicationName("QtDNetService");
     QCoreApplication::setApplicationVersion("0.0.1-alpha");
     QCoreApplication::setOrganizationName("Sarvaritdinov Ravil <ra9oaj@gmail.com>");
 
@@ -19,7 +20,8 @@ int main(int argc, char *argv[])
     else
     {
         a.childProcessStartSuccess();
-        QTimer::singleShot(600*1000,qApp,SLOT(quit()));
+        TcpService b;
+        QTimer::singleShot(60*1000,qApp,SLOT(quit()));
     }
 
 
