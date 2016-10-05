@@ -9,6 +9,11 @@
 #include <QRegExp>
 #include <QMap>
 
+#ifdef Q_OS_UNIX
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 #include "../QtDashboard/processsharedbuffer.h"
 #include "servicelog.h"
 
@@ -41,6 +46,8 @@ public slots:
     void setDebugMode(bool enable = true);
     void childProcessStartSuccess();
     void childProcessStartFailure(int error);
+    void beginChangeUID(); //Call before setuid() or seteuid() on Unix/Linux
+    void endChangeUID(); //Call after setuid() or seteuid() on Unix/Linux
 
 private slots:
     void scheduler();
@@ -49,6 +56,8 @@ private:
     void createChildProcess();
     void waitChildProcess(qint64 child_pid);
 
+    int _cur_euid;
+    int _last_euid;
     ProcessSharedBuffer _buffer;
     ServiceLog *_log;
     QUuid uuid;

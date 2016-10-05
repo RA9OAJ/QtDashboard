@@ -20,7 +20,10 @@ int main(int argc, char *argv[])
     else
     {
         a.childProcessStartSuccess();
-        TcpService b;
+        //TcpService b;
+        qSce->beginChangeUID();
+        seteuid(1000);
+        qSce->endChangeUID();
         QTimer::singleShot(60*1000,qApp,SLOT(quit()));
     }
 

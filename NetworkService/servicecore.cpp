@@ -3,6 +3,12 @@
 ServiceCore::ServiceCore(int &argc, char **argv) :
     QCoreApplication(argc,argv)
 {
+#ifdef Q_OS_UNIX
+    _last_euid = _cur_euid = geteuid();
+#elif
+    _last_euid = _cur_euid = -1;
+#endif
+
     parent_uuid = 0;
     child_created = false;
     scheduler_flag = false;
@@ -101,6 +107,22 @@ void ServiceCore::childProcessStartFailure(int error)
 {
     if(isChildProcess())
         _buffer.writeToBuffer("__FAILURE",error,true);
+}
+
+void ServiceCore::beginChangeUID()
+{
+#ifdef Q_OS_UNIX
+    _last_euid = geteuid();
+    _log->info(tr("Last uid='%1'.").arg(_last_euid));
+#endif
+}
+
+void ServiceCore::endChangeUID()
+{
+#ifdef Q_OS_UNIX
+    _cur_euid = geteuid();
+    _log->info(tr("New uid='%1'.").arg(_cur_euid));
+#endif
 }
 
 bool ServiceCore::isParentProcess() const
