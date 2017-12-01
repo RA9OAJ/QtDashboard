@@ -1,5 +1,6 @@
 import QtQuick 2.1
-import QtQuick.Controls 1.3
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.1
 import QtWebKit 3.0
 
@@ -36,9 +37,10 @@ ApplicationWindow {
             width: main_frame.width
             height: main_frame.height
             anchors.margins: 10
-            border.color: "#000000"
-            border.width: 1
+            //border.color: "#000000"
+            //border.width: 1
             //color: "#009900FF"
+            color: "transparent"
 
             Component.onCompleted: {
                 var component = Qt.createComponent("qrc:/WidgetManager.qml");
@@ -89,13 +91,13 @@ ApplicationWindow {
             width: parent.width * 21 / 100
             height: parent.height * 49 / 100
 
-            //radius: 20
+            radius: 20
             border.color: "#000000"
             border.width: 1
 
             anchors.leftMargin: 10
             anchors.left: main_frame.right
-            //color: "#99FFFFFF"
+            color: "#CCFFFFFF"
 
             Column {
                 spacing: 5
@@ -134,7 +136,7 @@ ApplicationWindow {
             width: parent.width * 21 / 100
             height: parent.height * 48 / 100
 
-            //radius: 20
+            radius: 20
             border.color: "#000000"
             border.width: 1
 
@@ -142,13 +144,42 @@ ApplicationWindow {
             anchors.topMargin: 10
             anchors.left: main_frame.right
             anchors.top: right_frame1.bottom
-            //color: "#99FFFFFF"
+            color: "#CCFFFFFF"
 
             Calendar {
                 x: 1
                 y: 1
-                width: parent.width - 2
-                height: parent.height - 2
+                anchors.centerIn: parent
+                width: parent.width - 20
+                height: parent.height - 20
+
+                style: CalendarStyle {
+                    //gridVisible: false
+                    gridColor: "white"
+                    background: Rectangle {
+                        color: "transparent"
+                        border.color: "transparent"
+                        border.width: 0
+                    }
+
+                    dayDelegate: Rectangle{
+                        color: styleData.selected ? "#5599FF" : "transparent"
+                        radius: 5
+
+                        Label {
+                            text: styleData.date.getDate()
+                            anchors.centerIn: parent
+                            color: thisMonth() ? styleData.selected ? "white" : "black" : "#666666"
+                            font.pixelSize: styleData.selected ? 29 : 22
+                        }
+
+                        function thisMonth() {
+                            var cur_month = new Date().getMonth()
+                            var month = new Date(styleData.date).getMonth()
+                            return cur_month == month
+                        }
+                    }
+                }
             }
         }
     }

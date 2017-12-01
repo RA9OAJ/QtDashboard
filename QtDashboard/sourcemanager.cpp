@@ -429,6 +429,11 @@ SourceManager::Statuses SourceManager::status() const
     return _status;
 }
 
+QString SourceManager::widget_name() const
+{
+    return getSource(_cur_id).value("widget");
+}
+
 bool SourceManager::createDefaultConfig(const QString &dir)
 {
     QFile fl(dir + "/config.xml");

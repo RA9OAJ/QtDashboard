@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QThread>
 #include <QDebug>
+#include <QLoggingCategory>
 
 #include "myapplication.h"
 #include "mycoreapplication.h"
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
         app = new MyApplication(argc,argv);
         app->setOnlyOneProcess(true);
         app->parsingParameters();
+        //QLoggingCategory::setFilterRules("*.debug=true; qt.*=false");
     }
 
     qmlRegisterType<SourceManager>("SourceManager",1,0,"SourceManager");

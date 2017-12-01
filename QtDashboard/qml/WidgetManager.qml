@@ -63,13 +63,19 @@ Item {
             }
         }
 
-        function getFreeWidget(widget_type) {
+        function getFreeWidget(widget_type, widget_name) {
             if(!freeWidgets.length)
                 return null
 
             var cur = null;
             for(var i = 0; i < freeWidgets.length; i++)
                 if(freeWidgets[i].widget_type === widget_type) {
+                    if(widget_type === 'WIDGET'
+                            && freeWidgets.splice(i,1)[0].widget_name === widget_name) {
+                        cur = freeWidgets.splice(i,1)[0]
+                        break
+                    }
+
                     cur = freeWidgets.splice(i,1)[0]
                     break
                 }
@@ -84,31 +90,38 @@ Item {
 
     Component.onCompleted: {
         srcmanager.readXmlSourceList("list")
+        console.log(srcmanager.size)
     }
 
     function createObject(cache){
         cache = typeof cache != "undefined" ? cache : false
-
         if(srcmanager.size > 0) {
             var component = null;
             var childRec = null;
 
             switch (srcmanager.sourceType) {
             case SourceManager.WEB:
-                childRec = internal.getFreeWidget("WEB")
+                childRec = internal.getFreeWidget("WEB", null)
                 if(childRec == null)
                     component = Qt.createComponent("WebWidget.qml")
                 break
             case SourceManager.IMAGE:
-                childRec = internal.getFreeWidget("IMAGE")
+                childRec = internal.getFreeWidget("IMAGE", null)
                 if(childRec == null)
                     component = Qt.createComponent("AImageWidget.qml")
                 break
             case SourceManager.AUDIO:
             case SourceManager.VIDEO:
-                childRec = internal.getFreeWidget("VIDEO")
+                childRec = internal.getFreeWidget("VIDEO", null)
                 if(childRec == null)
                     component = Qt.createComponent("MediaWidget.qml")
+                break
+            case SourceManager.WIDGET:
+                var widget_name = srcmanager.widget_name + "Widget.qml"
+                console.log("Prepare create " + widget_name)
+                childRec = internal.getFreeWidget("WIDGET", widget_name)
+                if(childRec == null)
+                    component = Qt.createComponent("DateTimeWidget.qml"/*widget_name*/)
                 break
             default:
                 break
@@ -117,7 +130,7 @@ Item {
             if(component != null && component.status === Component.Ready)
                 childRec = component.createObject(parent)
             else if(component != null && component.status === Component.Error)
-                console.log(component.errorString)
+                console.log(component.widget_type + " Error: " + component.errorString)
 
             if(childRec != null) {
                 /*var array = new Array

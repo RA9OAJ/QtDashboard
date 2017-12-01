@@ -75,6 +75,7 @@ public:
     Q_PROPERTY(QDateTime endPublicDate READ endPublicDate)
     Q_PROPERTY(bool showSectionTitle READ showSectionTitle)
     Q_PROPERTY(QString sectionTitle READ sectionTitle)
+    Q_PROPERTY(QString widget_name READ widget_name)
 
     QString source() const;
     Errors error() const;
@@ -99,6 +100,7 @@ public:
     bool showSectionTitle() const;
     QString sectionTitle() const;
     Statuses status() const;
+    QString widget_name() const;
 
 signals:
     void sourceChanget(int arg);
