@@ -39,6 +39,20 @@ void MyApplication::setOnlyOneProcess(bool flag, int timeout_sec)
         _first_proc = true;
 }
 
+bool MyApplication::addQMLRoot(QObject *root)
+{
+    QQuickWindow *win = qobject_cast<QQuickWindow *>(root);
+
+    if(win)
+    {
+        this->_qml_root_win = win;
+        connect(win, SIGNAL(afterRendering()), this, SLOT(activateQMLRootWindow()));
+        return true;
+    }
+
+    return false;
+}
+
 bool MyApplication::isFirstProcess()
 {
     if(_one_proc && !_first_proc)
@@ -119,6 +133,15 @@ void MyApplication::parsingParameters()
             }
         }
     }
+}
+
+void MyApplication::activateQMLRootWindow()
+{
+    disconnect(this->_qml_root_win, SIGNAL(afterRendering()), this, SLOT(activateQMLRootWindow()));
+    qDebug()<<"!!!SHOW!!!"<<this->_qml_root_win;
+    /*this->_qml_root_win->showMinimized();
+    this->_qml_root_win->setGeometry(0,0,100,100);
+    QTimer::singleShot(0, this->_qml_root_win, SLOT(showMaximized()));*/
 }
 
 void MyApplication::scheduler()

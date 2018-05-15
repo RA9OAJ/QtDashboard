@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QDebug>
+#include <QQuickWindow>
 #include "processsharedbuffer.h"
 
 class MyApplication : public QApplication
@@ -18,6 +19,7 @@ public:
 
     void setOnlyOneProcess(bool flag, int timeout_sec = 5);
     bool isFirstProcess();
+    bool addQMLRoot(QObject *root);
 
 signals:
 
@@ -25,6 +27,7 @@ public slots:
     void parsingParameters();
 protected slots:
     void scheduler();
+    void activateQMLRootWindow();
 
 protected:
     virtual bool isValidParams(const QStringList &args) const;
@@ -36,6 +39,7 @@ private:
 
     ProcessSharedBuffer *_shared_memory;
     QString _pidstr, _pingstr, _argstr;
+    QQuickWindow *_qml_root_win;
 };
 
 #endif // MYAPPLICATION_H

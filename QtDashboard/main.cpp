@@ -2,9 +2,11 @@
 #include <QQmlApplicationEngine>
 #include <QDateTime>
 #include <QScopedPointer>
+#include <QDesktopWidget>
 #include <QMap>
 #include <QThread>
 #include <QDebug>
+#include <QQuickWindow>
 #include <QLoggingCategory>
 
 #include "myapplication.h"
@@ -43,6 +45,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QString("%1/../share/QtDashboard/templates/DefaultTemplate/main.qml").arg(qApp->applicationDirPath())));
+    app->addQMLRoot(engine.rootObjects()[0]);
 
     return app->exec();
 }
