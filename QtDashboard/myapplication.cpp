@@ -46,7 +46,6 @@ bool MyApplication::addQMLRoot(QObject *root)
     if(win)
     {
         this->_qml_root_win = win;
-        connect(win, SIGNAL(afterRendering()), this, SLOT(activateQMLRootWindow()));
         return true;
     }
 
@@ -112,6 +111,8 @@ void MyApplication::parsingParameters()
 
         if(isValidParams(params))
         {
+            QString cur_arg;
+
             foreach (QString cur, params) {
                 if(cur == "--show-cursor")
                     qApp->setOverrideCursor(Qt::ArrowCursor);
@@ -130,18 +131,30 @@ void MyApplication::parsingParameters()
                 {
                     qDebug()<<"Reload!";
                 }
+                else if (cur == "--screen") {
+                    cur_arg = cur.replace("--", "");
+                    continue;
+                }
+                else if (!cur_arg.isEmpty()) {
+                    if(cur_arg == "screen") {
+                        int screen = cur.toInt();
+                        QTimer::singleShot(0, this, [=]() {this->activateQMLRootWindow(screen); });
+                    }
+                    cur_arg.clear();
+                }
             }
         }
     }
 }
 
-void MyApplication::activateQMLRootWindow()
+void MyApplication::activateQMLRootWindow(int screen)
 {
-    disconnect(this->_qml_root_win, SIGNAL(afterRendering()), this, SLOT(activateQMLRootWindow()));
-    qDebug()<<"!!!SHOW!!!"<<this->_qml_root_win;
-    /*this->_qml_root_win->showMinimized();
-    this->_qml_root_win->setGeometry(0,0,100,100);
-    QTimer::singleShot(0, this->_qml_root_win, SLOT(showMaximized()));*/
+    if(this->_qml_root_win && screen < this->desktop()->screenCount()) {
+        QPoint point = this->desktop()->screen(screen)->pos();
+        this->_qml_root_win->showMinimized();
+        this->_qml_root_win->setPosition(point);
+        QTimer::singleShot(500, this->_qml_root_win, SLOT(showFullScreen()));
+    }
 }
 
 void MyApplication::scheduler()
@@ -164,7 +177,8 @@ bool MyApplication::isValidParams(const QStringList &args) const
                 || cur == "--hide-cursor"
                 || cur == "--reload"
                 || cur == "--restart"
-                || cur == "--quit")
+                || cur == "--quit"
+                || cur == "--screen")
             return true;
         else return false;
     }

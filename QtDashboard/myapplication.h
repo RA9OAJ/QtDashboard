@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QQuickWindow>
+#include <QDesktopWidget>
 #include "processsharedbuffer.h"
 
 class MyApplication : public QApplication
@@ -27,7 +28,7 @@ public slots:
     void parsingParameters();
 protected slots:
     void scheduler();
-    void activateQMLRootWindow();
+    void activateQMLRootWindow(int screen);
 
 protected:
     virtual bool isValidParams(const QStringList &args) const;
